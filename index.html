@@ -274,20 +274,42 @@
   const results = document.getElementById('results');
   const priceBanner = document.getElementById('priceBanner');
 
-  fi.addEventListener('change', e => { addFiles(Array.from(e.target.files)); fi.value = ''; });
+  fi.addEventListener('change', function() {
+    if (!this.files || this.files.length === 0) return;
+    const files = Array.from(this.files);
+    let loaded = 0;
+    const toLoad = Math.min(files.length, 5 - images.length);
+    files.slice(0, toLoad).forEach(function(file) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        images.push({ b64: e.target.result.split(',')[1], mime: file.type || 'image/jpeg', src: e.target.result });
+        loaded++;
+        if (loaded === toLoad) renderPreviews();
+      };
+      reader.readAsDataURL(file);
+    });
+    fi.value = '';
+  });
+
   dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag'); });
   dz.addEventListener('dragleave', () => dz.classList.remove('drag'));
-  dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('drag'); addFiles(Array.from(e.dataTransfer.files)); });
-
-  function addFiles(files) {
-    const remaining = 5 - images.length;
-    files.slice(0, remaining).forEach(file => {
-      if (!file.type.startsWith('image/')) return;
-      const r = new FileReader();
-      r.onload = ev => { images.push({ b64: ev.result.split(',')[1], mime: file.type || 'image/jpeg', src: ev.result }); renderPreviews(); };
-      r.readAsDataURL(file);
+  dz.addEventListener('drop', function(e) {
+    e.preventDefault();
+    dz.classList.remove('drag');
+    if (!e.dataTransfer.files || e.dataTransfer.files.length === 0) return;
+    const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
+    const toLoad = Math.min(files.length, 5 - images.length);
+    let loaded = 0;
+    files.slice(0, toLoad).forEach(function(file) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        images.push({ b64: e.target.result.split(',')[1], mime: file.type || 'image/jpeg', src: e.target.result });
+        loaded++;
+        if (loaded === toLoad) renderPreviews();
+      };
+      reader.readAsDataURL(file);
     });
-  }
+  });
 
   function renderPreviews() {
     previews.innerHTML = '';
