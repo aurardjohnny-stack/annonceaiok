@@ -311,6 +311,26 @@
     });
   });
 
+  function compressImage(src, mime) {
+    return new Promise(resolve => {
+      const img = new Image();
+      img.onload = function() {
+        const canvas = document.createElement('canvas');
+        let w = img.width, h = img.height;
+        const max = 1024;
+        if (w > max || h > max) {
+          if (w > h) { h = Math.round(h * max / w); w = max; }
+          else { w = Math.round(w * max / h); h = max; }
+        }
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        const compressed = canvas.toDataURL('image/jpeg', 0.7);
+        resolve(compressed.split(',')[1]);
+      };
+      img.src = src;
+    });
+  }
+
   function renderPreviews() {
     previews.innerHTML = '';
     images.forEach((img, i) => {
@@ -353,8 +373,9 @@
     setStep(3);
 
     try {
+      const compressed = await Promise.all(images.map(img => compressImage(img.src, img.mime)));
       const content = [
-        ...images.map(img => ({ type: 'image', source: { type: 'base64', media_type: img.mime, data: img.b64 } })),
+        ...compressed.map(b64 => ({ type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: b64 } })),
         { type: 'text', text: prompt }
       ];
 
