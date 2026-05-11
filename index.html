@@ -141,11 +141,11 @@
     </div>
   </div>
 
-  <div class="upload-zone" id="dropzone">
-    <input type="file" id="fileInput" accept="image/*" multiple />
+  <input type="file" id="fileInput" accept="image/*" multiple style="display:none" />
+  <div class="upload-zone" id="dropzone" onclick="document.getElementById('fileInput').click()">
     <div class="upload-icon">📸</div>
     <div class="upload-title">Glisse tes photos ici</div>
-    <div class="upload-sub">ou clique pour choisir — JPG, PNG, WEBP</div>
+    <div class="upload-sub">ou <u style="cursor:pointer">clique pour choisir</u> — JPG, PNG, WEBP</div>
     <div class="upload-max">Jusqu'à 5 photos</div>
   </div>
 
@@ -260,7 +260,7 @@
 <footer>Fait avec ❤️ — AnnonceAI &copy; 2025</footer>
 
 <script>
-  const ANTHROPIC_API_KEY = 'REMPLACE_PAR_TA_CLE_API';
+
   let images = [];
 
   const fi = document.getElementById('fileInput');
@@ -336,9 +336,9 @@
         { type: 'text', text: prompt }
       ];
 
-      const res = await fetch('https://api.anthropic.com/v1/messages', {
+      const res = await fetch('/api/generate', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-api-key': ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01' },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 1500, messages: [{ role: 'user', content }] })
       });
 
