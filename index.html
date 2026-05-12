@@ -217,6 +217,15 @@
     .history-card-prix { font-family: 'Outfit', sans-serif; font-size: 18px; font-weight: 900; color: var(--green); margin-top: 8px; }
 
     /* LOGIN PROMPT */
+    /* HISTORY DETAIL */
+    .history-detail-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); z-index: 500; display: none; align-items: center; justify-content: center; padding: 1rem; overflow-y: auto; }
+    .history-detail-overlay.open { display: flex; }
+    .history-detail-modal { background: white; border-radius: var(--radius); width: 100%; max-width: 680px; box-shadow: var(--shadow-lg); animation: fadeUp 0.25s ease; max-height: 90vh; overflow-y: auto; }
+    .history-detail-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; background: white; z-index: 1; border-radius: var(--radius) var(--radius) 0 0; }
+    .history-detail-title { font-family: 'Outfit', sans-serif; font-size: 18px; font-weight: 800; }
+    .history-detail-body { padding: 1.5rem; }
+    .history-detail-tabs { display: flex; gap: 6px; margin-bottom: 1rem; flex-wrap: wrap; }
+
     .login-prompt { background: white; border: 1.5px dashed var(--border-md); border-radius: var(--radius); padding: 2rem; text-align: center; margin-bottom: 1rem; }
     .login-prompt-icon { font-size: 2rem; margin-bottom: 0.75rem; }
     .login-prompt-title { font-family: 'Outfit', sans-serif; font-size: 17px; font-weight: 800; margin-bottom: 0.4rem; }
@@ -278,6 +287,20 @@
   </style>
 </head>
 <body>
+
+<!-- HISTORY DETAIL MODAL -->
+<div class="history-detail-overlay" id="historyDetailOverlay" onclick="closeHistoryDetail(event)">
+  <div class="history-detail-modal">
+    <div class="history-detail-header">
+      <div class="history-detail-title" id="historyDetailTitle">Annonce</div>
+      <button class="modal-close" onclick="document.getElementById('historyDetailOverlay').classList.remove('open')">✕</button>
+    </div>
+    <div class="history-detail-body">
+      <div class="history-detail-tabs" id="historyDetailTabs"></div>
+      <div id="historyDetailContent"></div>
+    </div>
+  </div>
+</div>
 
 <!-- AUTH MODAL -->
 <div class="modal-overlay" id="modalOverlay" onclick="closeModalOnOverlay(event)">
@@ -696,8 +719,9 @@
       container.innerHTML = `<div class="history-empty"><div class="history-empty-icon">📭</div><div class="history-empty-title">Aucune annonce pour l'instant</div><div class="history-empty-sub">Génère ta première annonce et elle apparaîtra ici !</div></div>`;
       return;
     }
-    container.innerHTML = `<div class="history-list">${data.map(a => `
-      <div class="history-card">
+    window._historyData = data;
+    container.innerHTML = `<div class="history-list">${data.map((a, idx) => `
+      <div class="history-card" onclick="openHistoryDetail(${idx})">
         <div class="history-card-top">
           <div class="history-card-title">${a.vinted?.titre || a.type_objet || 'Annonce'}</div>
           <div class="history-card-date">${new Date(a.created_at).toLocaleDateString('fr-FR', { day:'numeric', month:'short', year:'numeric' })}</div>
@@ -709,6 +733,7 @@
         </div>
         ${a.vinted?.prix ? `<div class="history-card-prix">${a.vinted.prix}</div>` : ''}
         ${a.fourchette_prix ? `<div style="font-size:12px;color:var(--text-hint);margin-top:4px">Marché : ${a.fourchette_prix}</div>` : ''}
+        <div style="font-size:11px;color:var(--green-dark);margin-top:8px;font-weight:600">👆 Clique pour voir les détails</div>
       </div>`).join('')}</div>`;
   }
 
@@ -913,6 +938,65 @@
       }, 1500);
     });
   });
+
+  // ─── HISTORY DETAIL ───
+  function openHistoryDetail(idx) {
+    const a = window._historyData[idx];
+    if (!a) return;
+    document.getElementById('historyDetailTitle').textContent = a.vinted?.titre || a.type_objet || 'Annonce';
+    const platforms = [
+      { key: 'vinted', label: 'Vinted', color: '#09B1BA', bg: '#E8F8F9' },
+      { key: 'lbc', label: 'LeBonCoin', color: '#F56B2A', bg: '#FEF0E9' },
+      { key: 'facebook', label: 'Facebook', color: '#1877F2', bg: '#EBF3FE' },
+      { key: 'ebay', label: 'eBay', color: '#E53238', bg: '#FDEBEC' }
+    ];
+    const tabs = document.getElementById('historyDetailTabs');
+    const content = document.getElementById('historyDetailContent');
+    tabs.innerHTML = platforms.map((p, i) => `<button onclick="switchHistoryTab(${i})" id="htab-${i}" style="padding:7px 16px;border-radius:20px;font-size:13px;font-weight:700;cursor:pointer;border:2px solid ${i===0?p.color:'rgba(0,0,0,0.13)'};background:${i===0?p.color:'white'};color:${i===0?'white':'#6B7280'};font-family:inherit;transition:all 0.15s">${p.label}</button>`).join('');
+    window._historyPlatforms = platforms;
+    window._historyAnnonce = a;
+    switchHistoryTab(0);
+    document.getElementById('historyDetailOverlay').classList.add('open');
+  }
+
+  function switchHistoryTab(idx) {
+    const a = window._historyAnnonce;
+    const platforms = window._historyPlatforms;
+    const p = platforms[idx];
+    const data = a[p.key] || {};
+    document.querySelectorAll('[id^="htab-"]').forEach((t, i) => {
+      const pl = platforms[i];
+      t.style.background = i === idx ? pl.color : 'white';
+      t.style.color = i === idx ? 'white' : '#6B7280';
+      t.style.borderColor = i === idx ? pl.color : 'rgba(0,0,0,0.13)';
+    });
+    const fields = ['titre','description','categorie','marque','taille','couleur','matiere','etat','prix'];
+    const labels = ['Titre','Description','Catégorie','Marque','Taille','Couleur','Matière','État','Prix suggéré'];
+    document.getElementById('historyDetailContent').innerHTML = `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        ${fields.map((f, i) => data[f] ? `
+        <div class="${f === 'titre' || f === 'description' ? 'field-full' : ''}" style="grid-column:${f==='titre'||f==='description'?'1/-1':'auto'};background:#F5F4F0;border-radius:10px;padding:10px 12px;cursor:pointer;transition:background 0.15s" onclick="copyHistoryField('${data[f]}', this)">
+          <div style="font-size:10px;color:#9CA3AF;text-transform:uppercase;letter-spacing:0.6px;font-weight:700;margin-bottom:3px">${labels[i]}</div>
+          <div style="font-size:13px;color:#0D0D0D;font-weight:500;line-height:1.5">${f==='prix'?`<span style="font-family:Outfit,sans-serif;font-size:24px;font-weight:900;color:#00C896">${data[f]}</span>`:data[f]}</div>
+        </div>` : '').join('')}
+      </div>
+      <div style="font-size:11px;color:var(--text-hint);margin-top:12px;text-align:center">👆 Clique sur un champ pour le copier</div>`;
+  }
+
+  function copyHistoryField(text, el) {
+    navigator.clipboard.writeText(text).then(() => {
+      const lbl = el.querySelector('div:first-child');
+      const orig = lbl.textContent;
+      lbl.textContent = '✓ Copié !';
+      el.style.background = '#D1F7EA';
+      setTimeout(() => { lbl.textContent = orig; el.style.background = '#F5F4F0'; }, 1500);
+    });
+  }
+
+  function closeHistoryDetail(e) {
+    if (e.target === document.getElementById('historyDetailOverlay'))
+      document.getElementById('historyDetailOverlay').classList.remove('open');
+  }
 
   function showError(msg) { const el = document.getElementById('errorMsg'); el.textContent = msg; el.style.display = 'block'; }
   function hideError() { document.getElementById('errorMsg').style.display = 'none'; }
