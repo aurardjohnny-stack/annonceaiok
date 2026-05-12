@@ -235,6 +235,34 @@
     .step-desc { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
     footer { text-align: center; padding: 2rem; font-size: 12px; color: var(--text-hint); border-top: 1px solid var(--border); }
     @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* NUMBERS */
+    .numbers { background: var(--green); padding: 3rem 1.5rem; }
+    .numbers-inner { max-width: 800px; margin: 0 auto; display: flex; align-items: center; justify-content: center; gap: 0; flex-wrap: wrap; }
+    .number-item { flex: 1; min-width: 200px; text-align: center; padding: 1rem; }
+    .number-divider { width: 1px; height: 60px; background: rgba(255,255,255,0.25); flex-shrink: 0; }
+    .number-val { font-family: 'Outfit', sans-serif; font-size: clamp(2rem, 5vw, 3rem); font-weight: 900; color: white; line-height: 1; letter-spacing: -1px; }
+    .number-label { font-size: 14px; font-weight: 700; color: rgba(255,255,255,0.9); margin-top: 6px; }
+    .number-sub { font-size: 12px; color: rgba(255,255,255,0.6); margin-top: 3px; }
+
+    /* WHY */
+    .why { background: white; border-top: 1px solid var(--border); padding: 5rem 1.5rem; }
+    .why-inner { max-width: 860px; margin: 0 auto; }
+    .why-header { text-align: center; margin-bottom: 3rem; }
+    .why-tag { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--green-dark); margin-bottom: 1rem; }
+    .why-h2 { font-family: 'Outfit', sans-serif; font-size: clamp(1.6rem, 4vw, 2.4rem); font-weight: 900; letter-spacing: -0.5px; line-height: 1.2; }
+    .why-h2 span { color: var(--green); }
+    .why-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+    .why-col { border-radius: var(--radius); padding: 1.75rem; }
+    .why-before { background: #FFF5F5; border: 1.5px solid #FECACA; }
+    .why-after { background: #E8FBF5; border: 1.5px solid rgba(0,200,150,0.3); }
+    .why-col-title { font-family: 'Outfit', sans-serif; font-size: 16px; font-weight: 800; margin-bottom: 1.25rem; }
+    .why-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .why-list li { font-size: 14px; line-height: 1.5; color: var(--text); }
+    @media (max-width: 600px) {
+      .why-grid { grid-template-columns: 1fr; }
+      .number-divider { display: none; }
+    }
     @media (max-width: 520px) {
       header { padding: 0.9rem 1.25rem; }
       .hero { padding: 3.5rem 1rem 2.5rem; }
@@ -405,7 +433,7 @@
             <div class="field"><div class="lbl">Couleur</div><div class="val" id="v-couleur"></div></div>
             <div class="field"><div class="lbl">Matière</div><div class="val" id="v-matiere"></div></div>
             <div class="field"><div class="lbl">État</div><div class="val" id="v-etat"></div></div>
-            <div class="field field-price field-full"><div class="lbl">Prix suggéré</div><div class="price-val" id="v-prix"></div><div class="price-note" id="v-note"></div></div>
+            <div class="field field-price field-full"><div class="lbl">Prix suggéré <span style="font-size:10px;background:#E8FBF5;color:var(--green-dark);padding:2px 8px;border-radius:10px;margin-left:6px;font-weight:700;text-transform:none;letter-spacing:0">🔍 Analyse des annonces actuelles</span></div><div class="price-val" id="v-prix"></div><div class="price-note" id="v-note"></div></div>
           </div>
           <button class="btn-copy" onclick="copyPlatform('v', this)">📋 Copier tout</button>
         </div>
@@ -423,7 +451,7 @@
             <div class="field"><div class="lbl">Couleur</div><div class="val" id="l-couleur"></div></div>
             <div class="field"><div class="lbl">Matière</div><div class="val" id="l-matiere"></div></div>
             <div class="field"><div class="lbl">État</div><div class="val" id="l-etat"></div></div>
-            <div class="field field-price field-full"><div class="lbl">Prix suggéré</div><div class="price-val" id="l-prix"></div><div class="price-note" id="l-note"></div></div>
+            <div class="field field-price field-full"><div class="lbl">Prix suggéré <span style="font-size:10px;background:#E8FBF5;color:var(--green-dark);padding:2px 8px;border-radius:10px;margin-left:6px;font-weight:700;text-transform:none;letter-spacing:0">🔍 Analyse des annonces actuelles</span></div><div class="price-val" id="l-prix"></div><div class="price-note" id="l-note"></div></div>
           </div>
           <button class="btn-copy" onclick="copyPlatform('l', this)">📋 Copier tout</button>
         </div>
@@ -440,7 +468,7 @@
             <div class="field"><div class="lbl">Taille</div><div class="val" id="f-taille"></div></div>
             <div class="field"><div class="lbl">Couleur</div><div class="val" id="f-couleur"></div></div>
             <div class="field"><div class="lbl">État</div><div class="val" id="f-etat"></div></div>
-            <div class="field field-price field-full"><div class="lbl">Prix suggéré</div><div class="price-val" id="f-prix"></div><div class="price-note" id="f-note"></div></div>
+            <div class="field field-price field-full"><div class="lbl">Prix suggéré <span style="font-size:10px;background:#E8FBF5;color:var(--green-dark);padding:2px 8px;border-radius:10px;margin-left:6px;font-weight:700;text-transform:none;letter-spacing:0">🔍 Analyse des annonces actuelles</span></div><div class="price-val" id="f-prix"></div><div class="price-note" id="f-note"></div></div>
           </div>
           <button class="btn-copy" onclick="copyPlatform('f', this)">📋 Copier tout</button>
         </div>
@@ -458,7 +486,7 @@
             <div class="field"><div class="lbl">Couleur</div><div class="val" id="e-couleur"></div></div>
             <div class="field"><div class="lbl">Matière</div><div class="val" id="e-matiere"></div></div>
             <div class="field"><div class="lbl">État</div><div class="val" id="e-etat"></div></div>
-            <div class="field field-price field-full"><div class="lbl">Prix suggéré</div><div class="price-val" id="e-prix"></div><div class="price-note" id="e-note"></div></div>
+            <div class="field field-price field-full"><div class="lbl">Prix suggéré <span style="font-size:10px;background:#E8FBF5;color:var(--green-dark);padding:2px 8px;border-radius:10px;margin-left:6px;font-weight:700;text-transform:none;letter-spacing:0">🔍 Analyse des annonces actuelles</span></div><div class="price-val" id="e-prix"></div><div class="price-note" id="e-note"></div></div>
           </div>
           <button class="btn-copy" onclick="copyPlatform('e', this)">📋 Copier tout</button>
         </div>
@@ -471,6 +499,61 @@
     <div id="historyContent"></div>
   </div>
 </div>
+
+<!-- CHIFFRES -->
+<section class="numbers">
+  <div class="numbers-inner">
+    <div class="number-item">
+      <div class="number-val">4</div>
+      <div class="number-label">plateformes couvertes</div>
+      <div class="number-sub">Vinted, LeBonCoin, Facebook, eBay</div>
+    </div>
+    <div class="number-divider"></div>
+    <div class="number-item">
+      <div class="number-val">~30s</div>
+      <div class="number-label">pour 4 annonces complètes</div>
+      <div class="number-sub">Titre, description, prix, catégorie</div>
+    </div>
+    <div class="number-divider"></div>
+    <div class="number-item">
+      <div class="number-val">100%</div>
+      <div class="number-label">prix en temps réel</div>
+      <div class="number-sub">Analysés sur les vraies annonces du moment</div>
+    </div>
+  </div>
+</section>
+
+<!-- POURQUOI -->
+<section class="why">
+  <div class="why-inner">
+    <div class="why-header">
+      <div class="why-tag">✦ Pourquoi AssistAnnonce ?</div>
+      <h2 class="why-h2">Arrête de perdre du temps<br /><span>à rédiger à la main</span></h2>
+    </div>
+    <div class="why-grid">
+      <div class="why-col why-before">
+        <div class="why-col-title">😩 Sans AssistAnnonce</div>
+        <ul class="why-list">
+          <li>⏱️ 15-20 min par annonce à rédiger</li>
+          <li>😕 Prix au hasard, souvent trop bas ou trop haut</li>
+          <li>🔁 Tout refaire pour chaque plateforme</li>
+          <li>🤷 Catégorie et état choisis à l'instinct</li>
+          <li>📉 Annonces peu optimisées, moins de ventes</li>
+        </ul>
+      </div>
+      <div class="why-col why-after">
+        <div class="why-col-title">🚀 Avec AssistAnnonce</div>
+        <ul class="why-list">
+          <li>⚡ 4 annonces prêtes en 30 secondes</li>
+          <li>📊 Prix basé sur les vraies annonces du moment</li>
+          <li>✅ Adapté automatiquement à chaque plateforme</li>
+          <li>🎯 Catégorie, état et mots-clés optimisés</li>
+          <li>💰 Plus de chances de vendre vite et au bon prix</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
 
 <section class="how">
   <div class="how-tag">✦ Comment ça marche</div>
@@ -739,7 +822,7 @@
     setStep(1);
 
     const prompt = `Tu es un expert en revente d'objets d'occasion. Analyse ces photos et identifie l'objet (vêtement, électronique, meuble, livre, jeu vidéo, accessoire, etc.). AVANT de générer les annonces, utilise l'outil web_search pour chercher le prix de cet objet d'occasion en France (ex: "Nike Air Max 90 occasion prix Vinted LeBonCoin 2025"). Utilise les résultats pour proposer des prix précis et réalistes. Génère des annonces optimisées pour 4 plateformes. Pour les champs non applicables à cet objet (ex: taille pour une lampe), réponds avec une chaîne vide "". Réponds UNIQUEMENT en JSON valide sans markdown:
-{"article":{"type":"type d'objet détecté","marque":"","fourchette_marche":"ex: 15€-40€ sur LeBonCoin"},"vinted":{"titre":"max 60 chars","description":"2-3 phrases","categorie":"catégorie exacte Vinted","marque":"","taille":"taille si applicable, sinon vide","couleur":"","matiere":"matière/composition si applicable","etat":"Neuf avec étiquette/Neuf sans étiquette/Très bon état/Bon état/Satisfaisant","prix":"ex: 12€","note_prix":"justification courte"},"lbc":{"titre":"max 60 chars","description":"3-4 phrases","categorie":"catégorie LBC exacte","marque":"","taille":"dimensions ou taille si applicable","couleur":"","matiere":"","etat":"Neuf/Comme neuf/Bon état/État correct","prix":"","note_prix":""},"facebook":{"titre":"max 60 chars","description":"2-3 phrases directes","categorie":"catégorie Facebook Marketplace adaptée","marque":"","taille":"","couleur":"","etat":"Neuf/Comme neuf/Bon état/Usé","prix":"","note_prix":""},"ebay":{"titre":"max 80 chars avec mots-clés SEO","description":"4-5 phrases pro","categorie":"catégorie eBay exacte","marque":"","taille":"dimensions ou taille internationale si applicable","couleur":"","matiere":"","etat":"Neuf/Très bon état/Bon état/État correct","prix":"prix majoré frais eBay","note_prix":""}}`;
+{"article":{"type":"type d'objet détecté","marque":"","fourchette_marche":"ex: 15€-40€ sur LeBonCoin","sources":"ex: Basé sur 12 annonces trouvées sur Vinted et LeBonCoin"},"vinted":{"titre":"max 60 chars","description":"2-3 phrases","categorie":"catégorie exacte Vinted","marque":"","taille":"taille si applicable, sinon vide","couleur":"","matiere":"matière/composition si applicable","etat":"Neuf avec étiquette/Neuf sans étiquette/Très bon état/Bon état/Satisfaisant","prix":"ex: 12€","note_prix":"justification courte"},"lbc":{"titre":"max 60 chars","description":"3-4 phrases","categorie":"catégorie LBC exacte","marque":"","taille":"dimensions ou taille si applicable","couleur":"","matiere":"","etat":"Neuf/Comme neuf/Bon état/État correct","prix":"","note_prix":""},"facebook":{"titre":"max 60 chars","description":"2-3 phrases directes","categorie":"catégorie Facebook Marketplace adaptée","marque":"","taille":"","couleur":"","etat":"Neuf/Comme neuf/Bon état/Usé","prix":"","note_prix":""},"ebay":{"titre":"max 80 chars avec mots-clés SEO","description":"4-5 phrases pro","categorie":"catégorie eBay exacte","marque":"","taille":"dimensions ou taille internationale si applicable","couleur":"","matiere":"","etat":"Neuf/Très bon état/Bon état/État correct","prix":"prix majoré frais eBay","note_prix":""}}`;
 
     await new Promise(r => setTimeout(r, 600));
     setStep(2);
@@ -772,7 +855,7 @@
         fill('f-'+f, p.facebook[key]);
       });
 
-      document.getElementById('priceBanner').innerHTML = `📊 <strong>Prix marché estimé :</strong> ${p.article.fourchette_marche}`;
+      document.getElementById('priceBanner').innerHTML = `📊 <strong>Prix basé sur le marché en temps réel :</strong> ${p.article.fourchette_marche}${p.article.sources ? ' — <em>' + p.article.sources + '</em>' : ''}`;
       document.getElementById('priceBanner').style.display = 'block';
       document.getElementById('results').classList.add('show');
       switchTab('vinted');
