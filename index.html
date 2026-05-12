@@ -720,8 +720,13 @@
       return;
     }
     window._historyData = data;
-    container.innerHTML = `<div class="history-list">${data.map((a, idx) => `
-      <div class="history-card" onclick="openHistoryDetail(${idx})">
+    const list = document.createElement('div');
+    list.className = 'history-list';
+    data.forEach((a, idx) => {
+      const card = document.createElement('div');
+      card.className = 'history-card';
+      card.addEventListener('click', () => openHistoryDetail(idx));
+      card.innerHTML = `
         <div class="history-card-top">
           <div class="history-card-title">${a.vinted?.titre || a.type_objet || 'Annonce'}</div>
           <div class="history-card-date">${new Date(a.created_at).toLocaleDateString('fr-FR', { day:'numeric', month:'short', year:'numeric' })}</div>
@@ -733,8 +738,11 @@
         </div>
         ${a.vinted?.prix ? `<div class="history-card-prix">${a.vinted.prix}</div>` : ''}
         ${a.fourchette_prix ? `<div style="font-size:12px;color:var(--text-hint);margin-top:4px">Marché : ${a.fourchette_prix}</div>` : ''}
-        <div style="font-size:11px;color:var(--green-dark);margin-top:8px;font-weight:600">👆 Clique pour voir les détails</div>
-      </div>`).join('')}</div>`;
+        <div style="font-size:11px;color:var(--green-dark);margin-top:8px;font-weight:600">👆 Clique pour voir les détails</div>`;
+      list.appendChild(card);
+    });
+    container.innerHTML = '';
+    container.appendChild(list);
   }
 
   // ─── SAVE ANNONCE ───
