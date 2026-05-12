@@ -948,7 +948,7 @@
   });
 
   // ─── HISTORY DETAIL ───
-  function openHistoryDetail(idx) {
+  window.openHistoryDetail = function openHistoryDetail(idx) {
     const a = window._historyData[idx];
     if (!a) return;
     document.getElementById('historyDetailTitle').textContent = a.vinted?.titre || a.type_objet || 'Annonce';
@@ -967,7 +967,7 @@
     document.getElementById('historyDetailOverlay').classList.add('open');
   }
 
-  function switchHistoryTab(idx) {
+  window.switchHistoryTab = function switchHistoryTab(idx) {
     const a = window._historyAnnonce;
     const platforms = window._historyPlatforms;
     const p = platforms[idx];
@@ -991,7 +991,7 @@
       <div style="font-size:11px;color:var(--text-hint);margin-top:12px;text-align:center">👆 Clique sur un champ pour le copier</div>`;
   }
 
-  function copyHistoryField(text, el) {
+  window.copyHistoryField = function copyHistoryField(text, el) {
     navigator.clipboard.writeText(text).then(() => {
       const lbl = el.querySelector('div:first-child');
       const orig = lbl.textContent;
