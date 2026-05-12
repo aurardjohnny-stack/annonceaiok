@@ -715,7 +715,8 @@
     const container = document.getElementById('historyContent');
     container.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--text-hint)">Chargement…</div>';
     const { data, error } = await sb.from('annonces').select('*').order('created_at', { ascending: false });
-    if (error || !data || data.length === 0) {
+    if (error) { container.innerHTML = `<div class="history-empty"><div class="history-empty-icon">⚠️</div><div class="history-empty-title">Erreur de chargement</div></div>`; return; }
+    if (!data || data.length === 0) {
       container.innerHTML = `<div class="history-empty"><div class="history-empty-icon">📭</div><div class="history-empty-title">Aucune annonce pour l'instant</div><div class="history-empty-sub">Génère ta première annonce et elle apparaîtra ici !</div></div>`;
       return;
     }
