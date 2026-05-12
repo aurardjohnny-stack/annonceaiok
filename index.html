@@ -258,9 +258,23 @@
       <div class="modal-sub">Gratuit — sauvegarde toutes tes annonces</div>
       <div class="modal-error" id="registerError"></div>
       <div class="modal-success" id="registerSuccess"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="form-field">
+          <label class="form-label">Prénom</label>
+          <input class="form-input" type="text" id="registerPrenom" placeholder="Jean" />
+        </div>
+        <div class="form-field">
+          <label class="form-label">Nom</label>
+          <input class="form-input" type="text" id="registerNom" placeholder="Dupont" />
+        </div>
+      </div>
       <div class="form-field">
         <label class="form-label">Email</label>
         <input class="form-input" type="email" id="registerEmail" placeholder="ton@email.com" />
+      </div>
+      <div class="form-field">
+        <label class="form-label">Ville</label>
+        <input class="form-input" type="text" id="registerVille" placeholder="Paris, Lyon, Marseille…" />
       </div>
       <div class="form-field">
         <label class="form-label">Mot de passe</label>
@@ -511,17 +525,32 @@
   }
 
   async function handleRegister() {
+    const prenom = document.getElementById('registerPrenom').value.trim();
+    const nom = document.getElementById('registerNom').value.trim();
     const email = document.getElementById('registerEmail').value.trim();
+    const ville = document.getElementById('registerVille').value.trim();
     const password = document.getElementById('registerPassword').value;
     const btn = document.getElementById('btnRegister');
     const err = document.getElementById('registerError');
     const suc = document.getElementById('registerSuccess');
     err.style.display = 'none'; suc.style.display = 'none';
+    if (!prenom || !nom || !email || !password) {
+      err.textContent = 'Prénom, nom, email et mot de passe sont obligatoires.';
+      err.style.display = 'block'; return;
+    }
     btn.disabled = true; btn.textContent = 'Création…';
-    const { error } = await sb.auth.signUp({ email, password });
+    const { data, error } = await sb.auth.signUp({ email, password });
+    if (error) {
+      btn.disabled = false; btn.textContent = 'Créer mon compte';
+      err.textContent = error.message; err.style.display = 'block'; return;
+    }
+    // Save profile
+    if (data.user) {
+      await sb.from('profiles').insert({ id: data.user.id, prenom, nom, ville });
+    }
     btn.disabled = false; btn.textContent = 'Créer mon compte';
-    if (error) { err.textContent = error.message; err.style.display = 'block'; }
-    else { suc.textContent = '✅ Compte créé ! Vérifie tes emails pour confirmer.'; suc.style.display = 'block'; }
+    suc.textContent = '✅ Compte créé ! Vérifie tes emails pour confirmer.';
+    suc.style.display = 'block';
   }
 
   async function handleLogout() {
