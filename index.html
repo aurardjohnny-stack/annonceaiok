@@ -3,120 +3,220 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AnnonceAI — Génère tes annonces en quelques photos</title>
+  <title>AnnonceAI — Tes annonces prêtes en quelques secondes</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
     :root {
-      --green: #1D9E75; --green-dark: #0F6E56; --green-light: #E1F5EE;
-      --text: #111; --text-muted: #666; --text-hint: #999;
-      --border: rgba(0,0,0,0.1); --border-md: rgba(0,0,0,0.2);
-      --bg: #f8f8f6; --radius: 12px; --radius-sm: 8px;
+      --green: #00C896;
+      --green-dark: #00A87E;
+      --green-glow: rgba(0,200,150,0.18);
+      --text: #0D0D0D;
+      --text-muted: #6B7280;
+      --text-hint: #9CA3AF;
+      --bg: #F5F4F0;
+      --white: #FFFFFF;
+      --border: rgba(0,0,0,0.07);
+      --border-md: rgba(0,0,0,0.13);
+      --radius: 16px;
+      --radius-sm: 10px;
+      --radius-xs: 6px;
+      --shadow: 0 2px 16px rgba(0,0,0,0.07);
+      --shadow-lg: 0 8px 40px rgba(0,0,0,0.11);
+      --vinted: #09B1BA; --vinted-bg: #E8F8F9;
+      --lbc: #F56B2A;    --lbc-bg: #FEF0E9;
+      --fb: #1877F2;     --fb-bg: #EBF3FE;
+      --ebay: #E53238;   --ebay-bg: #FDEBEC;
     }
-    body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
-    header { padding: 1.25rem 2rem; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); background: white; position: sticky; top: 0; z-index: 10; }
-    .logo { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; color: var(--text); text-decoration: none; }
+
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
+
+    /* HEADER */
+    header { padding: 1rem 2rem; display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.85); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
+    .logo { font-family: 'Outfit', sans-serif; font-size: 21px; font-weight: 900; color: var(--text); text-decoration: none; letter-spacing: -0.5px; }
     .logo span { color: var(--green); }
-    .header-badge { font-size: 12px; background: var(--green-light); color: var(--green-dark); padding: 4px 12px; border-radius: 20px; font-weight: 500; }
-    .hero { text-align: center; padding: 4rem 1.5rem 3rem; max-width: 600px; margin: 0 auto; }
-    .hero-tag { display: inline-block; font-size: 12px; font-weight: 500; background: var(--green-light); color: var(--green-dark); padding: 4px 14px; border-radius: 20px; margin-bottom: 1.25rem; }
-    .hero h1 { font-family: 'Syne', sans-serif; font-size: clamp(2rem, 6vw, 3rem); font-weight: 800; line-height: 1.15; margin-bottom: 1rem; }
-    .hero h1 span { color: var(--green); }
-    .hero p { font-size: 16px; color: var(--text-muted); line-height: 1.6; margin-bottom: 2rem; }
-    .platforms-row { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 2.5rem; }
-    .platform-pill { font-size: 12px; font-weight: 500; padding: 5px 14px; border-radius: 20px; border: 1px solid var(--border-md); background: white; color: var(--text-muted); }
-    .tool-wrapper { max-width: 740px; margin: 0 auto; padding: 0 1.5rem 4rem; }
+    .badge-beta { font-size: 11px; font-weight: 700; background: var(--green); color: white; padding: 4px 12px; border-radius: 20px; letter-spacing: 0.3px; }
 
-    .tips-box { background: white; border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem; margin-bottom: 1.25rem; }
-    .tips-title { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; margin-bottom: 12px; }
-    .tips-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-    .tip-item { background: var(--bg); border-radius: var(--radius-sm); padding: 12px; text-align: center; }
-    .tip-icon { font-size: 1.5rem; margin-bottom: 6px; }
-    .tip-label { font-size: 12px; font-weight: 500; margin-bottom: 2px; }
+    /* HERO */
+    .hero { text-align: center; padding: 5rem 1.5rem 3.5rem; max-width: 640px; margin: 0 auto; position: relative; }
+    .hero::before { content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 600px; height: 400px; background: radial-gradient(ellipse at center, rgba(0,200,150,0.12) 0%, transparent 70%); pointer-events: none; }
+    .hero-eyebrow { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; color: var(--green-dark); background: white; border: 1.5px solid var(--green); padding: 5px 14px; border-radius: 20px; margin-bottom: 1.5rem; letter-spacing: 0.4px; text-transform: uppercase; animation: fadeUp 0.5s ease both; }
+    .hero-eyebrow::before { content: '✦'; color: var(--green); }
+    .hero h1 { font-family: 'Outfit', sans-serif; font-size: clamp(2.4rem, 7vw, 3.6rem); font-weight: 900; line-height: 1.1; letter-spacing: -1.5px; margin-bottom: 1.25rem; animation: fadeUp 0.5s 0.1s ease both; }
+    .hero h1 .accent { color: var(--green); position: relative; display: inline-block; }
+    .hero h1 .accent::after { content: ''; position: absolute; bottom: 2px; left: 0; right: 0; height: 4px; background: var(--green); border-radius: 2px; opacity: 0.25; }
+    .hero p { font-size: 16px; color: var(--text-muted); line-height: 1.7; margin-bottom: 2rem; animation: fadeUp 0.5s 0.2s ease both; }
+    .platforms-row { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 1rem; animation: fadeUp 0.5s 0.3s ease both; }
+    .platform-pill { font-size: 12px; font-weight: 600; padding: 5px 14px; border-radius: 20px; border: 1.5px solid var(--border-md); }
+    .p-vinted { border-color: var(--vinted); color: var(--vinted); background: var(--vinted-bg); }
+    .p-lbc    { border-color: var(--lbc); color: var(--lbc); background: var(--lbc-bg); }
+    .p-fb     { border-color: var(--fb); color: var(--fb); background: var(--fb-bg); }
+    .p-ebay   { border-color: var(--ebay); color: var(--ebay); background: var(--ebay-bg); }
+
+    /* STATS */
+    .stats-bar { display: flex; background: white; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; max-width: 480px; margin: 2rem auto 0; box-shadow: var(--shadow); animation: fadeUp 0.5s 0.35s ease both; }
+    .stat-item { flex: 1; padding: 14px 10px; text-align: center; border-right: 1px solid var(--border); }
+    .stat-item:last-child { border-right: none; }
+    .stat-num { font-family: 'Outfit', sans-serif; font-size: 22px; font-weight: 800; color: var(--text); line-height: 1; }
+    .stat-num span { color: var(--green); }
+    .stat-label { font-size: 11px; color: var(--text-hint); margin-top: 3px; }
+
+    /* TOOL */
+    .tool-wrapper { max-width: 760px; margin: 0 auto; padding: 0 1.25rem 5rem; }
+
+    /* TIPS */
+    .tips-box { background: white; border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem; margin-bottom: 1rem; box-shadow: var(--shadow); }
+    .tips-title { font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 700; margin-bottom: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+    .tips-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .tip-item { background: var(--bg); border-radius: var(--radius-sm); padding: 12px 10px; text-align: center; transition: transform 0.15s; }
+    .tip-item:hover { transform: translateY(-1px); }
+    .tip-icon { font-size: 1.6rem; margin-bottom: 6px; }
+    .tip-label { font-size: 12px; font-weight: 700; margin-bottom: 2px; color: var(--text); }
     .tip-desc { font-size: 11px; color: var(--text-hint); line-height: 1.4; }
-    .tip-badge { display: inline-block; font-size: 10px; background: var(--green-light); color: var(--green-dark); padding: 2px 8px; border-radius: 10px; margin-top: 4px; font-weight: 500; }
+    .tip-badge { display: inline-block; font-size: 10px; background: var(--green); color: white; padding: 2px 8px; border-radius: 10px; margin-top: 5px; font-weight: 600; }
+    .tip-badge.opt { background: #E5E7EB; color: var(--text-muted); }
 
-    .upload-zone { border: 2px dashed var(--border-md); border-radius: var(--radius); padding: 2rem 1.5rem; text-align: center; cursor: pointer; background: white; margin-bottom: 1rem; position: relative; transition: border-color 0.2s, background 0.2s; }
-    .upload-zone:hover, .upload-zone.drag { border-color: var(--green); background: var(--green-light); }
+    /* UPLOAD */
+    .upload-zone { border: 2px dashed var(--border-md); border-radius: var(--radius); padding: 2.5rem 1.5rem; text-align: center; cursor: pointer; background: white; margin-bottom: 1rem; position: relative; transition: all 0.2s; box-shadow: var(--shadow); }
+    .upload-zone:hover { border-color: var(--green); background: #F0FDF9; box-shadow: 0 0 0 4px var(--green-glow); }
+    .upload-zone.drag  { border-color: var(--green); background: #E8FBF5; box-shadow: 0 0 0 6px var(--green-glow); }
     .upload-zone input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
-    .upload-icon { font-size: 2.5rem; margin-bottom: 10px; }
-    .upload-title { font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 700; margin-bottom: 4px; }
+    .upload-icon-wrap { width: 64px; height: 64px; background: linear-gradient(135deg, #E8FBF5, #D1F7EA); border-radius: 18px; display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; font-size: 1.8rem; }
+    .upload-title { font-family: 'Outfit', sans-serif; font-size: 18px; font-weight: 800; margin-bottom: 5px; letter-spacing: -0.3px; }
     .upload-sub { font-size: 13px; color: var(--text-hint); }
-    .upload-max { font-size: 11px; color: var(--green-dark); background: var(--green-light); display: inline-block; padding: 2px 10px; border-radius: 10px; margin-top: 8px; }
+    .upload-max { display: inline-block; font-size: 11px; font-weight: 600; color: var(--green-dark); background: #E8FBF5; padding: 3px 12px; border-radius: 10px; margin-top: 10px; }
 
-    .previews { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 0.5rem; }
-    .preview-item { position: relative; width: 80px; height: 80px; border-radius: var(--radius-sm); overflow: hidden; border: 1px solid var(--border); }
+    /* PREVIEWS */
+    .previews { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 0.75rem; }
+    .preview-item { position: relative; width: 88px; height: 88px; border-radius: var(--radius-sm); overflow: hidden; border: 2px solid var(--border); box-shadow: var(--shadow); transition: transform 0.15s; }
+    .preview-item:hover { transform: scale(1.04); }
     .preview-item img { width: 100%; height: 100%; object-fit: cover; }
-    .preview-remove { position: absolute; top: 3px; right: 3px; width: 18px; height: 18px; background: rgba(0,0,0,0.65); color: white; border: none; border-radius: 50%; font-size: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-    .photo-count { font-size: 12px; color: var(--text-muted); margin-bottom: 1rem; }
-    .photo-count span { color: var(--green); font-weight: 500; }
+    .preview-remove { position: absolute; top: 4px; right: 4px; width: 20px; height: 20px; background: rgba(0,0,0,0.7); color: white; border: none; border-radius: 50%; font-size: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.15s; }
+    .preview-remove:hover { background: #ef4444; }
+    .photo-count { font-size: 12px; color: var(--text-muted); margin-bottom: 1rem; font-weight: 500; }
+    .photo-count span { color: var(--green); font-weight: 700; }
 
-    .btn-generate { width: 100%; padding: 15px; background: var(--green); color: white; border: none; border-radius: var(--radius-sm); font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700; cursor: pointer; transition: background 0.2s; margin-bottom: 1.5rem; }
-    .btn-generate:hover { background: var(--green-dark); }
-    .btn-generate:disabled { background: #ccc; cursor: not-allowed; }
+    /* BUTTON */
+    .btn-generate { width: 100%; padding: 17px; background: var(--green); color: white; border: none; border-radius: var(--radius-sm); font-family: 'Outfit', sans-serif; font-size: 17px; font-weight: 800; cursor: pointer; transition: all 0.2s; margin-bottom: 1.5rem; letter-spacing: -0.2px; box-shadow: 0 4px 20px rgba(0,200,150,0.35); position: relative; overflow: hidden; }
+    .btn-generate::after { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 60%); pointer-events: none; }
+    .btn-generate:hover { background: var(--green-dark); transform: translateY(-1px); box-shadow: 0 6px 28px rgba(0,200,150,0.45); }
+    .btn-generate:active { transform: translateY(0); }
+    .btn-generate:disabled { background: #D1D5DB; cursor: not-allowed; box-shadow: none; transform: none; }
 
-    .loading { text-align: center; padding: 2rem; display: none; }
-    .loading-steps { display: flex; flex-direction: column; gap: 8px; align-items: center; }
-    .lstep { font-size: 13px; color: var(--text-hint); display: flex; align-items: center; gap: 8px; transition: color 0.3s; }
-    .lstep.active { color: var(--green); font-weight: 500; }
+    /* LOADING */
+    .loading { text-align: center; padding: 2.5rem 1rem; display: none; }
+    .loading-inner { background: white; border: 1px solid var(--border); border-radius: var(--radius); padding: 2rem; box-shadow: var(--shadow); display: inline-block; min-width: 280px; }
+    .loading-title { font-family: 'Outfit', sans-serif; font-size: 16px; font-weight: 700; margin-bottom: 1.25rem; color: var(--text); }
+    .loading-steps { display: flex; flex-direction: column; gap: 10px; }
+    .lstep { font-size: 13px; color: var(--text-hint); display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: var(--radius-xs); transition: all 0.3s; font-weight: 500; }
+    .lstep.active { color: var(--green-dark); background: #E8FBF5; font-weight: 600; }
     .lstep.done { color: var(--text-muted); }
-    .lstep .dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+    .lstep.done .dot { background: var(--green); }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+    .lstep.active .dot { animation: pulse-dot 1s infinite; }
+    @keyframes pulse-dot { 0%,100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.5); opacity: 0.6; } }
 
-    .price-banner { background: white; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 16px; margin-bottom: 1rem; font-size: 13px; color: var(--text-muted); display: none; }
-    .price-banner strong { color: var(--text); }
+    /* PRICE BANNER */
+    .price-banner { background: linear-gradient(135deg, #E8FBF5, #D1F7EA); border: 1.5px solid var(--green); border-radius: var(--radius-sm); padding: 14px 18px; margin-bottom: 1rem; font-size: 14px; color: var(--green-dark); display: none; font-weight: 600; }
+    .price-banner strong { font-weight: 800; }
 
-    .tabs { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
-    .tab { padding: 7px 18px; border-radius: 20px; font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid var(--border-md); background: white; color: var(--text-muted); transition: all 0.15s; font-family: 'DM Sans', sans-serif; }
-    .tab.active { background: var(--green); color: white; border-color: var(--green); }
+    /* TABS */
+    .tabs { display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap; }
+    .tab { padding: 8px 18px; border-radius: 20px; font-size: 13px; font-weight: 700; cursor: pointer; border: 2px solid var(--border-md); background: white; color: var(--text-muted); transition: all 0.15s; font-family: 'Plus Jakarta Sans', sans-serif; }
+    .tab:hover { border-color: var(--text-muted); color: var(--text); }
+    .tab.active.t-vinted { background: var(--vinted); color: white; border-color: var(--vinted); }
+    .tab.active.t-lbc    { background: var(--lbc); color: white; border-color: var(--lbc); }
+    .tab.active.t-fb     { background: var(--fb); color: white; border-color: var(--fb); }
+    .tab.active.t-ebay   { background: var(--ebay); color: white; border-color: var(--ebay); }
 
+    /* CARDS */
     .platform-content { display: none; }
-    .platform-content.active { display: block; }
+    .platform-content.active { display: block; animation: fadeUp 0.25s ease; }
+    .card { background: white; border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; box-shadow: var(--shadow); }
+    .card-header { display: flex; align-items: center; gap: 10px; margin-bottom: 1.25rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border); }
+    .platform-badge { font-size: 12px; font-weight: 700; padding: 4px 12px; border-radius: 20px; letter-spacing: 0.2px; }
+    .pb-vinted { background: var(--vinted-bg); color: var(--vinted); }
+    .pb-lbc    { background: var(--lbc-bg); color: var(--lbc); }
+    .pb-fb     { background: var(--fb-bg); color: var(--fb); }
+    .pb-ebay   { background: var(--ebay-bg); color: var(--ebay); }
 
-    .card { background: white; border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem; }
-    .field { margin-bottom: 12px; }
-    .lbl { font-size: 11px; color: var(--text-hint); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 3px; }
-    .val { font-size: 14px; color: var(--text); line-height: 1.5; }
-    .price-val { font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 700; color: var(--green); }
-    .price-note { font-size: 12px; color: var(--text-hint); margin-top: 2px; }
-    .btn-copy { width: 100%; margin-top: 12px; padding: 10px; background: transparent; border: 1px solid var(--border-md); border-radius: var(--radius-sm); font-size: 13px; color: var(--text-muted); cursor: pointer; font-family: 'DM Sans', sans-serif; transition: background 0.15s; }
-    .btn-copy:hover { background: var(--bg); }
+    .fields-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+    .field-full { grid-column: 1 / -1; }
+    .field { background: var(--bg); border-radius: var(--radius-sm); padding: 10px 12px; }
+    .lbl { font-size: 10px; color: var(--text-hint); text-transform: uppercase; letter-spacing: 0.6px; font-weight: 700; margin-bottom: 3px; }
+    .val { font-size: 13px; color: var(--text); line-height: 1.5; font-weight: 500; }
+    .field-price { background: linear-gradient(135deg, #F0FDF9, #E8FBF5); border: 1.5px solid rgba(0,200,150,0.2); }
+    .price-val { font-family: 'Outfit', sans-serif; font-size: 28px; font-weight: 900; color: var(--green); letter-spacing: -0.5px; line-height: 1; }
+    .price-note { font-size: 11px; color: var(--text-hint); margin-top: 3px; }
 
-    .error-msg { background: #fff0f0; color: #c00; border-radius: var(--radius-sm); padding: 12px; font-size: 13px; margin-bottom: 1rem; display: none; }
+    .btn-copy { width: 100%; margin-top: 4px; padding: 11px; background: transparent; border: 2px solid var(--border-md); border-radius: var(--radius-sm); font-size: 13px; font-weight: 700; color: var(--text-muted); cursor: pointer; font-family: 'Plus Jakarta Sans', sans-serif; transition: all 0.15s; }
+    .btn-copy:hover { background: var(--bg); border-color: var(--text-muted); color: var(--text); }
+    .btn-copy.copied { background: var(--green); border-color: var(--green); color: white; }
+
+    /* ERROR */
+    .error-msg { background: #FEF2F2; color: #DC2626; border: 1px solid #FECACA; border-radius: var(--radius-sm); padding: 12px 16px; font-size: 13px; font-weight: 500; margin-bottom: 1rem; display: none; }
     .results { display: none; }
     .results.show { display: block; }
 
-    .how { background: white; border-top: 1px solid var(--border); padding: 4rem 1.5rem; text-align: center; }
-    .how h2 { font-family: 'Syne', sans-serif; font-size: 1.75rem; font-weight: 800; margin-bottom: 2.5rem; }
-    .steps-row { display: flex; gap: 2rem; justify-content: center; flex-wrap: wrap; max-width: 700px; margin: 0 auto; }
-    .step-card { flex: 1; min-width: 160px; max-width: 200px; }
-    .step-num { width: 40px; height: 40px; background: var(--green-light); color: var(--green-dark); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 16px; margin: 0 auto 12px; }
-    .step-title { font-weight: 500; font-size: 15px; margin-bottom: 6px; }
-    .step-desc { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
-    footer { text-align: center; padding: 2rem; font-size: 13px; color: var(--text-hint); border-top: 1px solid var(--border); }
+    /* HOW */
+    .how { background: white; border-top: 1px solid var(--border); padding: 5rem 1.5rem; text-align: center; }
+    .how-tag { display: inline-block; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--green-dark); margin-bottom: 1rem; }
+    .how h2 { font-family: 'Outfit', sans-serif; font-size: clamp(1.6rem, 4vw, 2.2rem); font-weight: 900; letter-spacing: -0.5px; margin-bottom: 3rem; }
+    .steps-row { display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap; max-width: 720px; margin: 0 auto; }
+    .step-card { flex: 1; min-width: 170px; max-width: 210px; background: var(--bg); border-radius: var(--radius); padding: 1.5rem 1.25rem; text-align: center; border: 1px solid var(--border); transition: transform 0.2s, box-shadow 0.2s; }
+    .step-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+    .step-num { width: 44px; height: 44px; background: var(--green); color: white; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-family: 'Outfit', sans-serif; font-weight: 900; font-size: 18px; margin: 0 auto 14px; }
+    .step-title { font-weight: 700; font-size: 15px; margin-bottom: 6px; font-family: 'Outfit', sans-serif; }
+    .step-desc { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+
+    footer { text-align: center; padding: 2rem; font-size: 12px; color: var(--text-hint); border-top: 1px solid var(--border); }
+
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+
+    @media (max-width: 520px) {
+      header { padding: 0.9rem 1.25rem; }
+      .hero { padding: 3.5rem 1rem 2.5rem; }
+      .tool-wrapper { padding: 0 1rem 4rem; }
+      .fields-grid { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
 
 <header>
   <a href="/" class="logo">annonce<span>AI</span></a>
-  <span class="header-badge">✦ Bêta gratuite</span>
+  <span class="badge-beta">Bêta gratuite</span>
 </header>
 
 <section class="hero">
-  <div class="hero-tag">✦ On s'occupe de tout</div>
-  <h1>Quelques photos.<br /><span>4 annonces prêtes.</span></h1>
-  <p>Vêtements, électronique, meubles, jeux vidéo… Upload tes photos — on rédige ton titre, ta description, la catégorie, l'état et le prix pour chaque plateforme.</p>
+  <div class="hero-eyebrow">On s'occupe de tout</div>
+  <h1>Quelques photos.<br /><span class="accent">4 annonces prêtes.</span></h1>
+  <p>Vêtements, électronique, meubles, jeux vidéo…<br />Uploade tes photos, on rédige tout pour toi.</p>
   <div class="platforms-row">
-    <span class="platform-pill">Vinted</span>
-    <span class="platform-pill">LeBonCoin</span>
-    <span class="platform-pill">Facebook Marketplace</span>
-    <span class="platform-pill">eBay</span>
+    <span class="platform-pill p-vinted">Vinted</span>
+    <span class="platform-pill p-lbc">LeBonCoin</span>
+    <span class="platform-pill p-fb">Facebook</span>
+    <span class="platform-pill p-ebay">eBay</span>
+  </div>
+  <div class="stats-bar">
+    <div class="stat-item">
+      <div class="stat-num">4<span>x</span></div>
+      <div class="stat-label">plateformes</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">~<span>30</span>s</div>
+      <div class="stat-label">par annonce</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num"><span>100</span>%</div>
+      <div class="stat-label">copier-coller</div>
+    </div>
   </div>
 </section>
 
 <div class="tool-wrapper">
-
   <div class="tips-box">
     <div class="tips-title">📸 Pour des annonces précises, prends 3 photos :</div>
     <div class="tips-grid">
@@ -136,14 +236,14 @@
         <div class="tip-icon">🔍</div>
         <div class="tip-label">Détails / défauts</div>
         <div class="tip-desc">Rayures, usure ou points forts</div>
-        <div class="tip-badge">Recommandé</div>
+        <div class="tip-badge opt">Recommandé</div>
       </div>
     </div>
   </div>
 
   <input type="file" id="fileInput" accept="image/*" multiple style="display:none" />
   <div class="upload-zone" id="dropzone" onclick="document.getElementById('fileInput').click()">
-    <div class="upload-icon">📸</div>
+    <div class="upload-icon-wrap">📸</div>
     <div class="upload-title">Glisse tes photos ici</div>
     <div class="upload-sub">ou <u style="cursor:pointer">clique pour choisir</u> — JPG, PNG, WEBP</div>
     <div class="upload-max">Jusqu'à 5 photos</div>
@@ -151,17 +251,20 @@
 
   <div class="previews" id="previews"></div>
   <div class="photo-count" id="photoCount" style="display:none">
-    <span id="photoNum">0</span> photo(s) — plus tu en ajoutes, plus l'annonce sera précise
+    <span id="photoNum">0</span> photo(s) — plus t'en mets, plus c'est précis 👌
   </div>
 
   <div class="error-msg" id="errorMsg"></div>
-  <button class="btn-generate" id="btnGenerate" disabled>✦ Générer les annonces</button>
+  <button class="btn-generate" id="btnGenerate" disabled>✦ Générer mes 4 annonces</button>
 
   <div class="loading" id="loading">
-    <div class="loading-steps">
-      <div class="lstep" id="step1"><span class="dot"></span> Analyse des photos...</div>
-      <div class="lstep" id="step2"><span class="dot"></span> Estimation des prix marché...</div>
-      <div class="lstep" id="step3"><span class="dot"></span> Génération des annonces...</div>
+    <div class="loading-inner">
+      <div class="loading-title">On s'occupe de tout… ⚡</div>
+      <div class="loading-steps">
+        <div class="lstep" id="step1"><span class="dot"></span> On analyse tes photos</div>
+        <div class="lstep" id="step2"><span class="dot"></span> On estime le prix marché</div>
+        <div class="lstep" id="step3"><span class="dot"></span> On rédige tes annonces</div>
+      </div>
     </div>
   </div>
 
@@ -169,75 +272,88 @@
 
   <div class="results" id="results">
     <div class="tabs">
-      <button class="tab active" onclick="switchTab('vinted')">Vinted</button>
-      <button class="tab" onclick="switchTab('lbc')">LeBonCoin</button>
-      <button class="tab" onclick="switchTab('fb')">Facebook</button>
-      <button class="tab" onclick="switchTab('ebay')">eBay</button>
+      <button class="tab t-vinted active" onclick="switchTab('vinted')">Vinted</button>
+      <button class="tab t-lbc" onclick="switchTab('lbc')">LeBonCoin</button>
+      <button class="tab t-fb" onclick="switchTab('fb')">Facebook</button>
+      <button class="tab t-ebay" onclick="switchTab('ebay')">eBay</button>
     </div>
 
     <div class="platform-content active" id="tab-vinted">
       <div class="card">
-        <div class="field"><div class="lbl">Titre</div><div class="val" id="v-titre"></div></div>
-        <div class="field"><div class="lbl">Description</div><div class="val" id="v-desc"></div></div>
-        <div class="field"><div class="lbl">Catégorie</div><div class="val" id="v-cat"></div></div>
-        <div class="field"><div class="lbl">Marque</div><div class="val" id="v-marque"></div></div>
-        <div class="field"><div class="lbl">Taille</div><div class="val" id="v-taille"></div></div>
-        <div class="field"><div class="lbl">Couleur</div><div class="val" id="v-couleur"></div></div>
-        <div class="field"><div class="lbl">Matière</div><div class="val" id="v-matiere"></div></div>
-        <div class="field"><div class="lbl">État</div><div class="val" id="v-etat"></div></div>
-        <div class="field"><div class="lbl">Prix suggéré</div><div class="price-val" id="v-prix"></div><div class="price-note" id="v-note"></div></div>
-        <button class="btn-copy" onclick="copyPlatform('v')">📋 Copier tout</button>
+        <div class="card-header"><span class="platform-badge pb-vinted">Vinted</span></div>
+        <div class="fields-grid">
+          <div class="field field-full"><div class="lbl">Titre</div><div class="val" id="v-titre"></div></div>
+          <div class="field field-full"><div class="lbl">Description</div><div class="val" id="v-desc"></div></div>
+          <div class="field"><div class="lbl">Catégorie</div><div class="val" id="v-cat"></div></div>
+          <div class="field"><div class="lbl">Marque</div><div class="val" id="v-marque"></div></div>
+          <div class="field"><div class="lbl">Taille</div><div class="val" id="v-taille"></div></div>
+          <div class="field"><div class="lbl">Couleur</div><div class="val" id="v-couleur"></div></div>
+          <div class="field"><div class="lbl">Matière</div><div class="val" id="v-matiere"></div></div>
+          <div class="field"><div class="lbl">État</div><div class="val" id="v-etat"></div></div>
+          <div class="field field-price field-full"><div class="lbl">Prix suggéré</div><div class="price-val" id="v-prix"></div><div class="price-note" id="v-note"></div></div>
+        </div>
+        <button class="btn-copy" onclick="copyPlatform('v', this)">📋 Copier tout</button>
       </div>
     </div>
 
     <div class="platform-content" id="tab-lbc">
       <div class="card">
-        <div class="field"><div class="lbl">Titre</div><div class="val" id="l-titre"></div></div>
-        <div class="field"><div class="lbl">Description</div><div class="val" id="l-desc"></div></div>
-        <div class="field"><div class="lbl">Catégorie</div><div class="val" id="l-cat"></div></div>
-        <div class="field"><div class="lbl">Marque</div><div class="val" id="l-marque"></div></div>
-        <div class="field"><div class="lbl">Taille</div><div class="val" id="l-taille"></div></div>
-        <div class="field"><div class="lbl">Couleur</div><div class="val" id="l-couleur"></div></div>
-        <div class="field"><div class="lbl">Matière</div><div class="val" id="l-matiere"></div></div>
-        <div class="field"><div class="lbl">État</div><div class="val" id="l-etat"></div></div>
-        <div class="field"><div class="lbl">Prix suggéré</div><div class="price-val" id="l-prix"></div><div class="price-note" id="l-note"></div></div>
-        <button class="btn-copy" onclick="copyPlatform('l')">📋 Copier tout</button>
+        <div class="card-header"><span class="platform-badge pb-lbc">LeBonCoin</span></div>
+        <div class="fields-grid">
+          <div class="field field-full"><div class="lbl">Titre</div><div class="val" id="l-titre"></div></div>
+          <div class="field field-full"><div class="lbl">Description</div><div class="val" id="l-desc"></div></div>
+          <div class="field"><div class="lbl">Catégorie</div><div class="val" id="l-cat"></div></div>
+          <div class="field"><div class="lbl">Marque</div><div class="val" id="l-marque"></div></div>
+          <div class="field"><div class="lbl">Taille</div><div class="val" id="l-taille"></div></div>
+          <div class="field"><div class="lbl">Couleur</div><div class="val" id="l-couleur"></div></div>
+          <div class="field"><div class="lbl">Matière</div><div class="val" id="l-matiere"></div></div>
+          <div class="field"><div class="lbl">État</div><div class="val" id="l-etat"></div></div>
+          <div class="field field-price field-full"><div class="lbl">Prix suggéré</div><div class="price-val" id="l-prix"></div><div class="price-note" id="l-note"></div></div>
+        </div>
+        <button class="btn-copy" onclick="copyPlatform('l', this)">📋 Copier tout</button>
       </div>
     </div>
 
     <div class="platform-content" id="tab-fb">
       <div class="card">
-        <div class="field"><div class="lbl">Titre</div><div class="val" id="f-titre"></div></div>
-        <div class="field"><div class="lbl">Description</div><div class="val" id="f-desc"></div></div>
-        <div class="field"><div class="lbl">Catégorie</div><div class="val" id="f-cat"></div></div>
-        <div class="field"><div class="lbl">Marque</div><div class="val" id="f-marque"></div></div>
-        <div class="field"><div class="lbl">Taille</div><div class="val" id="f-taille"></div></div>
-        <div class="field"><div class="lbl">Couleur</div><div class="val" id="f-couleur"></div></div>
-        <div class="field"><div class="lbl">État</div><div class="val" id="f-etat"></div></div>
-        <div class="field"><div class="lbl">Prix suggéré</div><div class="price-val" id="f-prix"></div><div class="price-note" id="f-note"></div></div>
-        <button class="btn-copy" onclick="copyPlatform('f')">📋 Copier tout</button>
+        <div class="card-header"><span class="platform-badge pb-fb">Facebook Marketplace</span></div>
+        <div class="fields-grid">
+          <div class="field field-full"><div class="lbl">Titre</div><div class="val" id="f-titre"></div></div>
+          <div class="field field-full"><div class="lbl">Description</div><div class="val" id="f-desc"></div></div>
+          <div class="field"><div class="lbl">Catégorie</div><div class="val" id="f-cat"></div></div>
+          <div class="field"><div class="lbl">Marque</div><div class="val" id="f-marque"></div></div>
+          <div class="field"><div class="lbl">Taille</div><div class="val" id="f-taille"></div></div>
+          <div class="field"><div class="lbl">Couleur</div><div class="val" id="f-couleur"></div></div>
+          <div class="field"><div class="lbl">État</div><div class="val" id="f-etat"></div></div>
+          <div class="field field-price field-full"><div class="lbl">Prix suggéré</div><div class="price-val" id="f-prix"></div><div class="price-note" id="f-note"></div></div>
+        </div>
+        <button class="btn-copy" onclick="copyPlatform('f', this)">📋 Copier tout</button>
       </div>
     </div>
 
     <div class="platform-content" id="tab-ebay">
       <div class="card">
-        <div class="field"><div class="lbl">Titre</div><div class="val" id="e-titre"></div></div>
-        <div class="field"><div class="lbl">Description</div><div class="val" id="e-desc"></div></div>
-        <div class="field"><div class="lbl">Catégorie</div><div class="val" id="e-cat"></div></div>
-        <div class="field"><div class="lbl">Marque</div><div class="val" id="e-marque"></div></div>
-        <div class="field"><div class="lbl">Taille</div><div class="val" id="e-taille"></div></div>
-        <div class="field"><div class="lbl">Couleur</div><div class="val" id="e-couleur"></div></div>
-        <div class="field"><div class="lbl">Matière</div><div class="val" id="e-matiere"></div></div>
-        <div class="field"><div class="lbl">État</div><div class="val" id="e-etat"></div></div>
-        <div class="field"><div class="lbl">Prix suggéré</div><div class="price-val" id="e-prix"></div><div class="price-note" id="e-note"></div></div>
-        <button class="btn-copy" onclick="copyPlatform('e')">📋 Copier tout</button>
+        <div class="card-header"><span class="platform-badge pb-ebay">eBay</span></div>
+        <div class="fields-grid">
+          <div class="field field-full"><div class="lbl">Titre</div><div class="val" id="e-titre"></div></div>
+          <div class="field field-full"><div class="lbl">Description</div><div class="val" id="e-desc"></div></div>
+          <div class="field"><div class="lbl">Catégorie</div><div class="val" id="e-cat"></div></div>
+          <div class="field"><div class="lbl">Marque</div><div class="val" id="e-marque"></div></div>
+          <div class="field"><div class="lbl">Taille</div><div class="val" id="e-taille"></div></div>
+          <div class="field"><div class="lbl">Couleur</div><div class="val" id="e-couleur"></div></div>
+          <div class="field"><div class="lbl">Matière</div><div class="val" id="e-matiere"></div></div>
+          <div class="field"><div class="lbl">État</div><div class="val" id="e-etat"></div></div>
+          <div class="field field-price field-full"><div class="lbl">Prix suggéré</div><div class="price-val" id="e-prix"></div><div class="price-note" id="e-note"></div></div>
+        </div>
+        <button class="btn-copy" onclick="copyPlatform('e', this)">📋 Copier tout</button>
       </div>
     </div>
   </div>
 </div>
 
 <section class="how">
-  <h2>Comment ça marche ?</h2>
+  <div class="how-tag">✦ Comment ça marche</div>
+  <h2>Simple comme bonjour 👋</h2>
   <div class="steps-row">
     <div class="step-card">
       <div class="step-num">1</div>
@@ -260,9 +376,7 @@
 <footer>Fait avec ❤️ — AnnonceAI &copy; 2025</footer>
 
 <script>
-
   let images = [];
-
   const fi = document.getElementById('fileInput');
   const dz = document.getElementById('dropzone');
   const previews = document.getElementById('previews');
@@ -324,8 +438,7 @@
         }
         canvas.width = w; canvas.height = h;
         canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-        const compressed = canvas.toDataURL('image/jpeg', 0.5);
-        resolve(compressed.split(',')[1]);
+        resolve(canvas.toDataURL('image/jpeg', 0.5).split(',')[1]);
       };
       img.src = src;
     });
@@ -378,13 +491,11 @@
         ...compressed.map(b64 => ({ type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: b64 } })),
         { type: 'text', text: prompt }
       ];
-
       const res = await fetch('/api/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ model: 'claude-sonnet-4-5', max_tokens: 1500, messages: [{ role: 'user', content }] })
       });
-
       const data = await res.json();
       const text = data.content.map(i => i.text || '').join('');
       const p = JSON.parse(text.replace(/```json|```/g, '').trim());
@@ -398,7 +509,6 @@
         const key = f === 'desc' ? 'description' : f === 'cat' ? 'categorie' : f === 'note' ? 'note_prix' : f;
         fill('f-'+f, p.facebook[key]);
       });
-
       priceBanner.innerHTML = `📊 <strong>Prix marché estimé :</strong> ${p.article.fourchette_marche}`;
       priceBanner.style.display = 'block';
       results.classList.add('show');
@@ -425,14 +535,13 @@
     e: { ids: ['titre','desc','cat','marque','taille','couleur','matiere','etat','prix'], labels: ['Titre','Description','Catégorie','Marque','Taille','Couleur','Matière','État','Prix'] }
   };
 
-  function copyPlatform(p) {
+  function copyPlatform(p, btn) {
     const { ids, labels } = fieldDefs[p];
     const text = ids.map((f, i) => `${labels[i]}: ${document.getElementById(p+'-'+f).textContent}`).join('\n');
     navigator.clipboard.writeText(text).then(() => {
-      const b = event.target;
-      const orig = b.textContent;
-      b.textContent = '✓ Copié !';
-      setTimeout(() => b.textContent = orig, 1500);
+      btn.textContent = '✓ Copié !';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = '📋 Copier tout'; btn.classList.remove('copied'); }, 1800);
     });
   }
 
