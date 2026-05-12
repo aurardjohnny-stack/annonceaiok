@@ -183,7 +183,13 @@
     .pb-ebay   { background: var(--ebay-bg); color: var(--ebay); }
     .fields-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
     .field-full { grid-column: 1 / -1; }
-    .field { background: var(--bg); border-radius: var(--radius-sm); padding: 10px 12px; }
+    .field { background: var(--bg); border-radius: var(--radius-sm); padding: 10px 12px; cursor: pointer; transition: background 0.15s; position: relative; }
+    .field:hover { background: #E8FBF5; }
+    .field:hover::after { content: '📋'; position: absolute; top: 8px; right: 10px; font-size: 12px; opacity: 0.5; }
+    .field.field-price { cursor: default; }
+    .field.field-price:hover { background: linear-gradient(135deg, #F0FDF9, #E8FBF5); }
+    .field.field-price:hover::after { display: none; }
+    .field.just-copied { background: #D1F7EA !important; }
     .lbl { font-size: 10px; color: var(--text-hint); text-transform: uppercase; letter-spacing: 0.6px; font-weight: 700; margin-bottom: 3px; }
     .val { font-size: 13px; color: var(--text); line-height: 1.5; font-weight: 500; }
     .field-price { background: linear-gradient(135deg, #F0FDF9, #E8FBF5); border: 1.5px solid rgba(0,200,150,0.2); }
@@ -890,6 +896,23 @@
       setTimeout(() => { btn.textContent = '📋 Copier tout'; btn.classList.remove('copied'); }, 1800);
     });
   }
+
+  // Click to copy on fields
+  document.addEventListener('click', function(e) {
+    const field = e.target.closest('.field:not(.field-price)');
+    if (!field) return;
+    const val = field.querySelector('.val');
+    if (!val || !val.textContent.trim()) return;
+    navigator.clipboard.writeText(val.textContent.trim()).then(() => {
+      field.classList.add('just-copied');
+      const orig = field.querySelector('.lbl').textContent;
+      field.querySelector('.lbl').textContent = '✓ Copié !';
+      setTimeout(() => {
+        field.classList.remove('just-copied');
+        field.querySelector('.lbl').textContent = orig;
+      }, 1500);
+    });
+  });
 
   function showError(msg) { const el = document.getElementById('errorMsg'); el.textContent = msg; el.style.display = 'block'; }
   function hideError() { document.getElementById('errorMsg').style.display = 'none'; }
