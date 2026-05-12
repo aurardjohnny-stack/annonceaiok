@@ -3,41 +3,62 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AnnonceAI — Tes annonces prêtes en quelques secondes</title>
+  <title>AssistAnnonce — Tes annonces prêtes en quelques secondes</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --green: #00C896;
-      --green-dark: #00A87E;
-      --green-glow: rgba(0,200,150,0.18);
-      --text: #0D0D0D;
-      --text-muted: #6B7280;
-      --text-hint: #9CA3AF;
-      --bg: #F5F4F0;
-      --white: #FFFFFF;
-      --border: rgba(0,0,0,0.07);
-      --border-md: rgba(0,0,0,0.13);
-      --radius: 16px;
-      --radius-sm: 10px;
-      --radius-xs: 6px;
-      --shadow: 0 2px 16px rgba(0,0,0,0.07);
-      --shadow-lg: 0 8px 40px rgba(0,0,0,0.11);
+      --green: #00C896; --green-dark: #00A87E; --green-glow: rgba(0,200,150,0.18);
+      --text: #0D0D0D; --text-muted: #6B7280; --text-hint: #9CA3AF;
+      --bg: #F5F4F0; --white: #FFFFFF;
+      --border: rgba(0,0,0,0.07); --border-md: rgba(0,0,0,0.13);
+      --radius: 16px; --radius-sm: 10px; --radius-xs: 6px;
+      --shadow: 0 2px 16px rgba(0,0,0,0.07); --shadow-lg: 0 8px 40px rgba(0,0,0,0.11);
       --vinted: #09B1BA; --vinted-bg: #E8F8F9;
       --lbc: #F56B2A;    --lbc-bg: #FEF0E9;
       --fb: #1877F2;     --fb-bg: #EBF3FE;
       --ebay: #E53238;   --ebay-bg: #FDEBEC;
     }
-
     body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
 
     /* HEADER */
     header { padding: 1rem 2rem; display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.85); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
-    .logo { font-family: 'Outfit', sans-serif; font-size: 21px; font-weight: 900; color: var(--text); text-decoration: none; letter-spacing: -0.5px; }
+    .logo { font-family: 'Outfit', sans-serif; font-size: 21px; font-weight: 900; color: var(--text); text-decoration: none; letter-spacing: -0.5px; cursor: pointer; }
     .logo span { color: var(--green); }
-    .badge-beta { font-size: 11px; font-weight: 700; background: var(--green); color: white; padding: 4px 12px; border-radius: 20px; letter-spacing: 0.3px; }
+    .header-right { display: flex; align-items: center; gap: 10px; }
+    .badge-beta { font-size: 11px; font-weight: 700; background: var(--green); color: white; padding: 4px 12px; border-radius: 20px; }
+    .btn-auth { font-size: 13px; font-weight: 700; padding: 7px 16px; border-radius: 20px; border: 2px solid var(--border-md); background: white; color: var(--text); cursor: pointer; font-family: 'Plus Jakarta Sans', sans-serif; transition: all 0.15s; }
+    .btn-auth:hover { border-color: var(--green); color: var(--green); }
+    .btn-auth.connected { background: var(--green); color: white; border-color: var(--green); }
+    .user-menu { position: relative; }
+    .user-dropdown { position: absolute; right: 0; top: calc(100% + 8px); background: white; border: 1px solid var(--border); border-radius: var(--radius-sm); box-shadow: var(--shadow-lg); min-width: 180px; overflow: hidden; display: none; z-index: 200; }
+    .user-dropdown.open { display: block; }
+    .user-email { padding: 10px 14px; font-size: 12px; color: var(--text-hint); border-bottom: 1px solid var(--border); }
+    .dropdown-item { padding: 10px 14px; font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.15s; display: flex; align-items: center; gap: 8px; }
+    .dropdown-item:hover { background: var(--bg); }
+    .dropdown-item.danger { color: #DC2626; }
+
+    /* AUTH MODAL */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); z-index: 500; display: none; align-items: center; justify-content: center; padding: 1rem; }
+    .modal-overlay.open { display: flex; }
+    .modal { background: white; border-radius: var(--radius); padding: 2rem; width: 100%; max-width: 400px; box-shadow: var(--shadow-lg); animation: fadeUp 0.25s ease; }
+    .modal-title { font-family: 'Outfit', sans-serif; font-size: 22px; font-weight: 900; letter-spacing: -0.5px; margin-bottom: 0.4rem; }
+    .modal-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 1.5rem; }
+    .form-field { margin-bottom: 1rem; }
+    .form-label { font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; display: block; }
+    .form-input { width: 100%; padding: 11px 14px; border: 2px solid var(--border-md); border-radius: var(--radius-sm); font-size: 14px; font-family: 'Plus Jakarta Sans', sans-serif; transition: border-color 0.15s; outline: none; }
+    .form-input:focus { border-color: var(--green); }
+    .btn-submit { width: 100%; padding: 14px; background: var(--green); color: white; border: none; border-radius: var(--radius-sm); font-family: 'Outfit', sans-serif; font-size: 16px; font-weight: 800; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 16px rgba(0,200,150,0.3); margin-top: 0.5rem; }
+    .btn-submit:hover { background: var(--green-dark); }
+    .btn-submit:disabled { background: #D1D5DB; box-shadow: none; cursor: not-allowed; }
+    .modal-switch { text-align: center; margin-top: 1rem; font-size: 13px; color: var(--text-muted); }
+    .modal-switch a { color: var(--green); font-weight: 700; cursor: pointer; text-decoration: none; }
+    .modal-switch a:hover { text-decoration: underline; }
+    .modal-error { background: #FEF2F2; color: #DC2626; border-radius: var(--radius-xs); padding: 10px 12px; font-size: 13px; font-weight: 500; margin-bottom: 1rem; display: none; }
+    .modal-success { background: #E8FBF5; color: var(--green-dark); border-radius: var(--radius-xs); padding: 10px 12px; font-size: 13px; font-weight: 500; margin-bottom: 1rem; display: none; }
+    .modal-close { float: right; background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-hint); margin-top: -4px; }
 
     /* HERO */
     .hero { text-align: center; padding: 5rem 1.5rem 3.5rem; max-width: 640px; margin: 0 auto; position: relative; }
@@ -65,6 +86,11 @@
 
     /* TOOL */
     .tool-wrapper { max-width: 760px; margin: 0 auto; padding: 0 1.25rem 5rem; }
+
+    /* NAV TABS (generate / history) */
+    .main-nav { display: flex; gap: 6px; margin-bottom: 1.25rem; }
+    .main-tab { padding: 9px 20px; border-radius: 20px; font-size: 13px; font-weight: 700; cursor: pointer; border: 2px solid var(--border-md); background: white; color: var(--text-muted); transition: all 0.15s; font-family: 'Plus Jakarta Sans', sans-serif; }
+    .main-tab.active { background: var(--text); color: white; border-color: var(--text); }
 
     /* TIPS */
     .tips-box { background: white; border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem; margin-bottom: 1rem; box-shadow: var(--shadow); }
@@ -105,10 +131,13 @@
     .btn-generate:active { transform: translateY(0); }
     .btn-generate:disabled { background: #D1D5DB; cursor: not-allowed; box-shadow: none; transform: none; }
 
+    /* SAVE BANNER */
+    .save-banner { background: #E8FBF5; border: 1.5px solid var(--green); border-radius: var(--radius-sm); padding: 12px 16px; margin-bottom: 1rem; font-size: 13px; color: var(--green-dark); font-weight: 600; display: none; }
+
     /* LOADING */
     .loading { text-align: center; padding: 2.5rem 1rem; display: none; }
     .loading-inner { background: white; border: 1px solid var(--border); border-radius: var(--radius); padding: 2rem; box-shadow: var(--shadow); display: inline-block; min-width: 280px; }
-    .loading-title { font-family: 'Outfit', sans-serif; font-size: 16px; font-weight: 700; margin-bottom: 1.25rem; color: var(--text); }
+    .loading-title { font-family: 'Outfit', sans-serif; font-size: 16px; font-weight: 700; margin-bottom: 1.25rem; }
     .loading-steps { display: flex; flex-direction: column; gap: 10px; }
     .lstep { font-size: 13px; color: var(--text-hint); display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: var(--radius-xs); transition: all 0.3s; font-weight: 500; }
     .lstep.active { color: var(--green-dark); background: #E8FBF5; font-weight: 600; }
@@ -125,7 +154,6 @@
     /* TABS */
     .tabs { display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap; }
     .tab { padding: 8px 18px; border-radius: 20px; font-size: 13px; font-weight: 700; cursor: pointer; border: 2px solid var(--border-md); background: white; color: var(--text-muted); transition: all 0.15s; font-family: 'Plus Jakarta Sans', sans-serif; }
-    .tab:hover { border-color: var(--text-muted); color: var(--text); }
     .tab.active.t-vinted { background: var(--vinted); color: white; border-color: var(--vinted); }
     .tab.active.t-lbc    { background: var(--lbc); color: white; border-color: var(--lbc); }
     .tab.active.t-fb     { background: var(--fb); color: white; border-color: var(--fb); }
@@ -136,12 +164,11 @@
     .platform-content.active { display: block; animation: fadeUp 0.25s ease; }
     .card { background: white; border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; box-shadow: var(--shadow); }
     .card-header { display: flex; align-items: center; gap: 10px; margin-bottom: 1.25rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border); }
-    .platform-badge { font-size: 12px; font-weight: 700; padding: 4px 12px; border-radius: 20px; letter-spacing: 0.2px; }
+    .platform-badge { font-size: 12px; font-weight: 700; padding: 4px 12px; border-radius: 20px; }
     .pb-vinted { background: var(--vinted-bg); color: var(--vinted); }
     .pb-lbc    { background: var(--lbc-bg); color: var(--lbc); }
     .pb-fb     { background: var(--fb-bg); color: var(--fb); }
     .pb-ebay   { background: var(--ebay-bg); color: var(--ebay); }
-
     .fields-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
     .field-full { grid-column: 1 / -1; }
     .field { background: var(--bg); border-radius: var(--radius-sm); padding: 10px 12px; }
@@ -150,10 +177,34 @@
     .field-price { background: linear-gradient(135deg, #F0FDF9, #E8FBF5); border: 1.5px solid rgba(0,200,150,0.2); }
     .price-val { font-family: 'Outfit', sans-serif; font-size: 28px; font-weight: 900; color: var(--green); letter-spacing: -0.5px; line-height: 1; }
     .price-note { font-size: 11px; color: var(--text-hint); margin-top: 3px; }
-
     .btn-copy { width: 100%; margin-top: 4px; padding: 11px; background: transparent; border: 2px solid var(--border-md); border-radius: var(--radius-sm); font-size: 13px; font-weight: 700; color: var(--text-muted); cursor: pointer; font-family: 'Plus Jakarta Sans', sans-serif; transition: all 0.15s; }
     .btn-copy:hover { background: var(--bg); border-color: var(--text-muted); color: var(--text); }
     .btn-copy.copied { background: var(--green); border-color: var(--green); color: white; }
+
+    /* HISTORY */
+    .history-view { display: none; }
+    .history-view.active { display: block; }
+    .history-empty { text-align: center; padding: 4rem 2rem; }
+    .history-empty-icon { font-size: 3rem; margin-bottom: 1rem; }
+    .history-empty-title { font-family: 'Outfit', sans-serif; font-size: 20px; font-weight: 800; margin-bottom: 0.5rem; }
+    .history-empty-sub { font-size: 14px; color: var(--text-muted); }
+    .history-list { display: flex; flex-direction: column; gap: 10px; }
+    .history-card { background: white; border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem; box-shadow: var(--shadow); cursor: pointer; transition: all 0.15s; }
+    .history-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-1px); }
+    .history-card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+    .history-card-title { font-family: 'Outfit', sans-serif; font-size: 16px; font-weight: 800; }
+    .history-card-date { font-size: 11px; color: var(--text-hint); }
+    .history-card-meta { display: flex; gap: 6px; flex-wrap: wrap; }
+    .history-tag { font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 10px; }
+    .history-card-prix { font-family: 'Outfit', sans-serif; font-size: 18px; font-weight: 900; color: var(--green); margin-top: 8px; }
+
+    /* LOGIN PROMPT */
+    .login-prompt { background: white; border: 1.5px dashed var(--border-md); border-radius: var(--radius); padding: 2rem; text-align: center; margin-bottom: 1rem; }
+    .login-prompt-icon { font-size: 2rem; margin-bottom: 0.75rem; }
+    .login-prompt-title { font-family: 'Outfit', sans-serif; font-size: 17px; font-weight: 800; margin-bottom: 0.4rem; }
+    .login-prompt-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 1rem; }
+    .btn-login-prompt { padding: 10px 24px; background: var(--green); color: white; border: none; border-radius: var(--radius-sm); font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.15s; box-shadow: 0 3px 12px rgba(0,200,150,0.3); }
+    .btn-login-prompt:hover { background: var(--green-dark); }
 
     /* ERROR */
     .error-msg { background: #FEF2F2; color: #DC2626; border: 1px solid #FECACA; border-radius: var(--radius-sm); padding: 12px 16px; font-size: 13px; font-weight: 500; margin-bottom: 1rem; display: none; }
@@ -170,11 +221,8 @@
     .step-num { width: 44px; height: 44px; background: var(--green); color: white; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-family: 'Outfit', sans-serif; font-weight: 900; font-size: 18px; margin: 0 auto 14px; }
     .step-title { font-weight: 700; font-size: 15px; margin-bottom: 6px; font-family: 'Outfit', sans-serif; }
     .step-desc { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
-
     footer { text-align: center; padding: 2rem; font-size: 12px; color: var(--text-hint); border-top: 1px solid var(--border); }
-
     @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
-
     @media (max-width: 520px) {
       header { padding: 0.9rem 1.25rem; }
       .hero { padding: 3.5rem 1rem 2.5rem; }
@@ -185,9 +233,58 @@
 </head>
 <body>
 
+<!-- AUTH MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModalOnOverlay(event)">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div id="modalLogin">
+      <div class="modal-title">Connexion 👋</div>
+      <div class="modal-sub">Retrouve toutes tes annonces sauvegardées</div>
+      <div class="modal-error" id="loginError"></div>
+      <div class="modal-success" id="loginSuccess"></div>
+      <div class="form-field">
+        <label class="form-label">Email</label>
+        <input class="form-input" type="email" id="loginEmail" placeholder="ton@email.com" />
+      </div>
+      <div class="form-field">
+        <label class="form-label">Mot de passe</label>
+        <input class="form-input" type="password" id="loginPassword" placeholder="••••••••" />
+      </div>
+      <button class="btn-submit" id="btnLogin" onclick="handleLogin()">Se connecter</button>
+      <div class="modal-switch">Pas encore de compte ? <a onclick="switchToRegister()">Créer un compte</a></div>
+    </div>
+    <div id="modalRegister" style="display:none">
+      <div class="modal-title">Créer un compte ✨</div>
+      <div class="modal-sub">Gratuit — sauvegarde toutes tes annonces</div>
+      <div class="modal-error" id="registerError"></div>
+      <div class="modal-success" id="registerSuccess"></div>
+      <div class="form-field">
+        <label class="form-label">Email</label>
+        <input class="form-input" type="email" id="registerEmail" placeholder="ton@email.com" />
+      </div>
+      <div class="form-field">
+        <label class="form-label">Mot de passe</label>
+        <input class="form-input" type="password" id="registerPassword" placeholder="min. 6 caractères" />
+      </div>
+      <button class="btn-submit" id="btnRegister" onclick="handleRegister()">Créer mon compte</button>
+      <div class="modal-switch">Déjà un compte ? <a onclick="switchToLogin()">Se connecter</a></div>
+    </div>
+  </div>
+</div>
+
 <header>
-  <a href="/" class="logo">annonce<span>AI</span></a>
-  <span class="badge-beta">Bêta gratuite</span>
+  <a class="logo" onclick="showGenerate()">assist<span>annonce</span></a>
+  <div class="header-right">
+    
+    <div class="user-menu" id="userMenu">
+      <button class="btn-auth" id="btnAuthHeader" onclick="toggleUserMenu()">Connexion</button>
+      <div class="user-dropdown" id="userDropdown">
+        <div class="user-email" id="userEmailDisplay"></div>
+        <div class="dropdown-item" onclick="showHistory()">📋 Mes annonces</div>
+        <div class="dropdown-item danger" onclick="handleLogout()">👋 Se déconnecter</div>
+      </div>
+    </div>
+  </div>
 </header>
 
 <section class="hero">
@@ -201,153 +298,143 @@
     <span class="platform-pill p-ebay">eBay</span>
   </div>
   <div class="stats-bar">
-    <div class="stat-item">
-      <div class="stat-num">4<span>x</span></div>
-      <div class="stat-label">plateformes</div>
-    </div>
-    <div class="stat-item">
-      <div class="stat-num">~<span>30</span>s</div>
-      <div class="stat-label">par annonce</div>
-    </div>
-    <div class="stat-item">
-      <div class="stat-num"><span>100</span>%</div>
-      <div class="stat-label">copier-coller</div>
-    </div>
+    <div class="stat-item"><div class="stat-num">4<span>x</span></div><div class="stat-label">plateformes</div></div>
+    <div class="stat-item"><div class="stat-num">~<span>30</span>s</div><div class="stat-label">par annonce</div></div>
+    <div class="stat-item"><div class="stat-num"><span>100</span>%</div><div class="stat-label">copier-coller</div></div>
   </div>
 </section>
 
 <div class="tool-wrapper">
-  <div class="tips-box">
-    <div class="tips-title">📸 Pour des annonces précises, prends 3 photos :</div>
-    <div class="tips-grid">
-      <div class="tip-item">
-        <div class="tip-icon">📦</div>
-        <div class="tip-label">Vue générale</div>
-        <div class="tip-desc">L'objet en entier, bien visible</div>
-        <div class="tip-badge">Indispensable</div>
+  <div class="main-nav" id="mainNav" style="display:none">
+    <button class="main-tab active" id="tabGenerate" onclick="showGenerate()">✦ Générer</button>
+    <button class="main-tab" id="tabHistory" onclick="showHistory()">📋 Mes annonces</button>
+  </div>
+
+  <!-- GENERATE VIEW -->
+  <div id="generateView">
+    <div class="tips-box">
+      <div class="tips-title">📸 Pour des annonces précises, prends 3 photos :</div>
+      <div class="tips-grid">
+        <div class="tip-item"><div class="tip-icon">📦</div><div class="tip-label">Vue générale</div><div class="tip-desc">L'objet en entier, bien visible</div><div class="tip-badge">Indispensable</div></div>
+        <div class="tip-item"><div class="tip-icon">🏷️</div><div class="tip-label">Marque / modèle</div><div class="tip-desc">Étiquette, logo ou référence</div><div class="tip-badge">Indispensable</div></div>
+        <div class="tip-item"><div class="tip-icon">🔍</div><div class="tip-label">Détails / défauts</div><div class="tip-desc">Rayures, usure ou points forts</div><div class="tip-badge opt">Recommandé</div></div>
       </div>
-      <div class="tip-item">
-        <div class="tip-icon">🏷️</div>
-        <div class="tip-label">Marque / modèle</div>
-        <div class="tip-desc">Étiquette, logo ou référence</div>
-        <div class="tip-badge">Indispensable</div>
+    </div>
+
+    <input type="file" id="fileInput" accept="image/*" multiple style="display:none" />
+    <div class="upload-zone" id="dropzone" onclick="document.getElementById('fileInput').click()">
+      <div class="upload-icon-wrap">📸</div>
+      <div class="upload-title">Glisse tes photos ici</div>
+      <div class="upload-sub">ou <u style="cursor:pointer">clique pour choisir</u> — JPG, PNG, WEBP</div>
+      <div class="upload-max">Jusqu'à 5 photos</div>
+    </div>
+
+    <div class="previews" id="previews"></div>
+    <div class="photo-count" id="photoCount" style="display:none">
+      <span id="photoNum">0</span> photo(s) — plus t'en mets, plus c'est précis 👌
+    </div>
+
+    <div class="error-msg" id="errorMsg"></div>
+    <button class="btn-generate" id="btnGenerate" disabled>✦ Générer mes 4 annonces</button>
+
+    <div class="loading" id="loading">
+      <div class="loading-inner">
+        <div class="loading-title">On s'occupe de tout… ⚡</div>
+        <div class="loading-steps">
+          <div class="lstep" id="step1"><span class="dot"></span> On analyse tes photos</div>
+          <div class="lstep" id="step2"><span class="dot"></span> On estime le prix marché</div>
+          <div class="lstep" id="step3"><span class="dot"></span> On rédige tes annonces</div>
+        </div>
       </div>
-      <div class="tip-item">
-        <div class="tip-icon">🔍</div>
-        <div class="tip-label">Détails / défauts</div>
-        <div class="tip-desc">Rayures, usure ou points forts</div>
-        <div class="tip-badge opt">Recommandé</div>
+    </div>
+
+    <div class="save-banner" id="saveBanner">✅ Annonce sauvegardée dans ton historique !</div>
+    <div class="price-banner" id="priceBanner"></div>
+
+    <div class="results" id="results">
+      <div class="tabs">
+        <button class="tab t-vinted active" onclick="switchTab('vinted')">Vinted</button>
+        <button class="tab t-lbc" onclick="switchTab('lbc')">LeBonCoin</button>
+        <button class="tab t-fb" onclick="switchTab('fb')">Facebook</button>
+        <button class="tab t-ebay" onclick="switchTab('ebay')">eBay</button>
+      </div>
+
+      <div class="platform-content active" id="tab-vinted">
+        <div class="card">
+          <div class="card-header"><span class="platform-badge pb-vinted">Vinted</span></div>
+          <div class="fields-grid">
+            <div class="field field-full"><div class="lbl">Titre</div><div class="val" id="v-titre"></div></div>
+            <div class="field field-full"><div class="lbl">Description</div><div class="val" id="v-desc"></div></div>
+            <div class="field"><div class="lbl">Catégorie</div><div class="val" id="v-cat"></div></div>
+            <div class="field"><div class="lbl">Marque</div><div class="val" id="v-marque"></div></div>
+            <div class="field"><div class="lbl">Taille</div><div class="val" id="v-taille"></div></div>
+            <div class="field"><div class="lbl">Couleur</div><div class="val" id="v-couleur"></div></div>
+            <div class="field"><div class="lbl">Matière</div><div class="val" id="v-matiere"></div></div>
+            <div class="field"><div class="lbl">État</div><div class="val" id="v-etat"></div></div>
+            <div class="field field-price field-full"><div class="lbl">Prix suggéré</div><div class="price-val" id="v-prix"></div><div class="price-note" id="v-note"></div></div>
+          </div>
+          <button class="btn-copy" onclick="copyPlatform('v', this)">📋 Copier tout</button>
+        </div>
+      </div>
+
+      <div class="platform-content" id="tab-lbc">
+        <div class="card">
+          <div class="card-header"><span class="platform-badge pb-lbc">LeBonCoin</span></div>
+          <div class="fields-grid">
+            <div class="field field-full"><div class="lbl">Titre</div><div class="val" id="l-titre"></div></div>
+            <div class="field field-full"><div class="lbl">Description</div><div class="val" id="l-desc"></div></div>
+            <div class="field"><div class="lbl">Catégorie</div><div class="val" id="l-cat"></div></div>
+            <div class="field"><div class="lbl">Marque</div><div class="val" id="l-marque"></div></div>
+            <div class="field"><div class="lbl">Taille</div><div class="val" id="l-taille"></div></div>
+            <div class="field"><div class="lbl">Couleur</div><div class="val" id="l-couleur"></div></div>
+            <div class="field"><div class="lbl">Matière</div><div class="val" id="l-matiere"></div></div>
+            <div class="field"><div class="lbl">État</div><div class="val" id="l-etat"></div></div>
+            <div class="field field-price field-full"><div class="lbl">Prix suggéré</div><div class="price-val" id="l-prix"></div><div class="price-note" id="l-note"></div></div>
+          </div>
+          <button class="btn-copy" onclick="copyPlatform('l', this)">📋 Copier tout</button>
+        </div>
+      </div>
+
+      <div class="platform-content" id="tab-fb">
+        <div class="card">
+          <div class="card-header"><span class="platform-badge pb-fb">Facebook Marketplace</span></div>
+          <div class="fields-grid">
+            <div class="field field-full"><div class="lbl">Titre</div><div class="val" id="f-titre"></div></div>
+            <div class="field field-full"><div class="lbl">Description</div><div class="val" id="f-desc"></div></div>
+            <div class="field"><div class="lbl">Catégorie</div><div class="val" id="f-cat"></div></div>
+            <div class="field"><div class="lbl">Marque</div><div class="val" id="f-marque"></div></div>
+            <div class="field"><div class="lbl">Taille</div><div class="val" id="f-taille"></div></div>
+            <div class="field"><div class="lbl">Couleur</div><div class="val" id="f-couleur"></div></div>
+            <div class="field"><div class="lbl">État</div><div class="val" id="f-etat"></div></div>
+            <div class="field field-price field-full"><div class="lbl">Prix suggéré</div><div class="price-val" id="f-prix"></div><div class="price-note" id="f-note"></div></div>
+          </div>
+          <button class="btn-copy" onclick="copyPlatform('f', this)">📋 Copier tout</button>
+        </div>
+      </div>
+
+      <div class="platform-content" id="tab-ebay">
+        <div class="card">
+          <div class="card-header"><span class="platform-badge pb-ebay">eBay</span></div>
+          <div class="fields-grid">
+            <div class="field field-full"><div class="lbl">Titre</div><div class="val" id="e-titre"></div></div>
+            <div class="field field-full"><div class="lbl">Description</div><div class="val" id="e-desc"></div></div>
+            <div class="field"><div class="lbl">Catégorie</div><div class="val" id="e-cat"></div></div>
+            <div class="field"><div class="lbl">Marque</div><div class="val" id="e-marque"></div></div>
+            <div class="field"><div class="lbl">Taille</div><div class="val" id="e-taille"></div></div>
+            <div class="field"><div class="lbl">Couleur</div><div class="val" id="e-couleur"></div></div>
+            <div class="field"><div class="lbl">Matière</div><div class="val" id="e-matiere"></div></div>
+            <div class="field"><div class="lbl">État</div><div class="val" id="e-etat"></div></div>
+            <div class="field field-price field-full"><div class="lbl">Prix suggéré</div><div class="price-val" id="e-prix"></div><div class="price-note" id="e-note"></div></div>
+          </div>
+          <button class="btn-copy" onclick="copyPlatform('e', this)">📋 Copier tout</button>
+        </div>
       </div>
     </div>
   </div>
 
-  <input type="file" id="fileInput" accept="image/*" multiple style="display:none" />
-  <div class="upload-zone" id="dropzone" onclick="document.getElementById('fileInput').click()">
-    <div class="upload-icon-wrap">📸</div>
-    <div class="upload-title">Glisse tes photos ici</div>
-    <div class="upload-sub">ou <u style="cursor:pointer">clique pour choisir</u> — JPG, PNG, WEBP</div>
-    <div class="upload-max">Jusqu'à 5 photos</div>
-  </div>
-
-  <div class="previews" id="previews"></div>
-  <div class="photo-count" id="photoCount" style="display:none">
-    <span id="photoNum">0</span> photo(s) — plus t'en mets, plus c'est précis 👌
-  </div>
-
-  <div class="error-msg" id="errorMsg"></div>
-  <button class="btn-generate" id="btnGenerate" disabled>✦ Générer mes 4 annonces</button>
-
-  <div class="loading" id="loading">
-    <div class="loading-inner">
-      <div class="loading-title">On s'occupe de tout… ⚡</div>
-      <div class="loading-steps">
-        <div class="lstep" id="step1"><span class="dot"></span> On analyse tes photos</div>
-        <div class="lstep" id="step2"><span class="dot"></span> On estime le prix marché</div>
-        <div class="lstep" id="step3"><span class="dot"></span> On rédige tes annonces</div>
-      </div>
-    </div>
-  </div>
-
-  <div class="price-banner" id="priceBanner"></div>
-
-  <div class="results" id="results">
-    <div class="tabs">
-      <button class="tab t-vinted active" onclick="switchTab('vinted')">Vinted</button>
-      <button class="tab t-lbc" onclick="switchTab('lbc')">LeBonCoin</button>
-      <button class="tab t-fb" onclick="switchTab('fb')">Facebook</button>
-      <button class="tab t-ebay" onclick="switchTab('ebay')">eBay</button>
-    </div>
-
-    <div class="platform-content active" id="tab-vinted">
-      <div class="card">
-        <div class="card-header"><span class="platform-badge pb-vinted">Vinted</span></div>
-        <div class="fields-grid">
-          <div class="field field-full"><div class="lbl">Titre</div><div class="val" id="v-titre"></div></div>
-          <div class="field field-full"><div class="lbl">Description</div><div class="val" id="v-desc"></div></div>
-          <div class="field"><div class="lbl">Catégorie</div><div class="val" id="v-cat"></div></div>
-          <div class="field"><div class="lbl">Marque</div><div class="val" id="v-marque"></div></div>
-          <div class="field"><div class="lbl">Taille</div><div class="val" id="v-taille"></div></div>
-          <div class="field"><div class="lbl">Couleur</div><div class="val" id="v-couleur"></div></div>
-          <div class="field"><div class="lbl">Matière</div><div class="val" id="v-matiere"></div></div>
-          <div class="field"><div class="lbl">État</div><div class="val" id="v-etat"></div></div>
-          <div class="field field-price field-full"><div class="lbl">Prix suggéré</div><div class="price-val" id="v-prix"></div><div class="price-note" id="v-note"></div></div>
-        </div>
-        <button class="btn-copy" onclick="copyPlatform('v', this)">📋 Copier tout</button>
-      </div>
-    </div>
-
-    <div class="platform-content" id="tab-lbc">
-      <div class="card">
-        <div class="card-header"><span class="platform-badge pb-lbc">LeBonCoin</span></div>
-        <div class="fields-grid">
-          <div class="field field-full"><div class="lbl">Titre</div><div class="val" id="l-titre"></div></div>
-          <div class="field field-full"><div class="lbl">Description</div><div class="val" id="l-desc"></div></div>
-          <div class="field"><div class="lbl">Catégorie</div><div class="val" id="l-cat"></div></div>
-          <div class="field"><div class="lbl">Marque</div><div class="val" id="l-marque"></div></div>
-          <div class="field"><div class="lbl">Taille</div><div class="val" id="l-taille"></div></div>
-          <div class="field"><div class="lbl">Couleur</div><div class="val" id="l-couleur"></div></div>
-          <div class="field"><div class="lbl">Matière</div><div class="val" id="l-matiere"></div></div>
-          <div class="field"><div class="lbl">État</div><div class="val" id="l-etat"></div></div>
-          <div class="field field-price field-full"><div class="lbl">Prix suggéré</div><div class="price-val" id="l-prix"></div><div class="price-note" id="l-note"></div></div>
-        </div>
-        <button class="btn-copy" onclick="copyPlatform('l', this)">📋 Copier tout</button>
-      </div>
-    </div>
-
-    <div class="platform-content" id="tab-fb">
-      <div class="card">
-        <div class="card-header"><span class="platform-badge pb-fb">Facebook Marketplace</span></div>
-        <div class="fields-grid">
-          <div class="field field-full"><div class="lbl">Titre</div><div class="val" id="f-titre"></div></div>
-          <div class="field field-full"><div class="lbl">Description</div><div class="val" id="f-desc"></div></div>
-          <div class="field"><div class="lbl">Catégorie</div><div class="val" id="f-cat"></div></div>
-          <div class="field"><div class="lbl">Marque</div><div class="val" id="f-marque"></div></div>
-          <div class="field"><div class="lbl">Taille</div><div class="val" id="f-taille"></div></div>
-          <div class="field"><div class="lbl">Couleur</div><div class="val" id="f-couleur"></div></div>
-          <div class="field"><div class="lbl">État</div><div class="val" id="f-etat"></div></div>
-          <div class="field field-price field-full"><div class="lbl">Prix suggéré</div><div class="price-val" id="f-prix"></div><div class="price-note" id="f-note"></div></div>
-        </div>
-        <button class="btn-copy" onclick="copyPlatform('f', this)">📋 Copier tout</button>
-      </div>
-    </div>
-
-    <div class="platform-content" id="tab-ebay">
-      <div class="card">
-        <div class="card-header"><span class="platform-badge pb-ebay">eBay</span></div>
-        <div class="fields-grid">
-          <div class="field field-full"><div class="lbl">Titre</div><div class="val" id="e-titre"></div></div>
-          <div class="field field-full"><div class="lbl">Description</div><div class="val" id="e-desc"></div></div>
-          <div class="field"><div class="lbl">Catégorie</div><div class="val" id="e-cat"></div></div>
-          <div class="field"><div class="lbl">Marque</div><div class="val" id="e-marque"></div></div>
-          <div class="field"><div class="lbl">Taille</div><div class="val" id="e-taille"></div></div>
-          <div class="field"><div class="lbl">Couleur</div><div class="val" id="e-couleur"></div></div>
-          <div class="field"><div class="lbl">Matière</div><div class="val" id="e-matiere"></div></div>
-          <div class="field"><div class="lbl">État</div><div class="val" id="e-etat"></div></div>
-          <div class="field field-price field-full"><div class="lbl">Prix suggéré</div><div class="price-val" id="e-prix"></div><div class="price-note" id="e-note"></div></div>
-        </div>
-        <button class="btn-copy" onclick="copyPlatform('e', this)">📋 Copier tout</button>
-      </div>
-    </div>
+  <!-- HISTORY VIEW -->
+  <div id="historyView" class="history-view">
+    <div id="historyContent"></div>
   </div>
 </div>
 
@@ -355,50 +442,169 @@
   <div class="how-tag">✦ Comment ça marche</div>
   <h2>Simple comme bonjour 👋</h2>
   <div class="steps-row">
-    <div class="step-card">
-      <div class="step-num">1</div>
-      <div class="step-title">Prends 3 photos</div>
-      <div class="step-desc">Vue générale, marque/modèle, et un détail ou défaut visible</div>
-    </div>
-    <div class="step-card">
-      <div class="step-num">2</div>
-      <div class="step-title">On analyse tout</div>
-      <div class="step-desc">Type d'objet, marque, état et prix marché — on s'en charge pour toi</div>
-    </div>
-    <div class="step-card">
-      <div class="step-num">3</div>
-      <div class="step-title">Copie-colle</div>
-      <div class="step-desc">Annonces prêtes pour Vinted, LBC, Facebook et eBay</div>
-    </div>
+    <div class="step-card"><div class="step-num">1</div><div class="step-title">Prends 3 photos</div><div class="step-desc">Vue générale, marque/modèle, et un détail ou défaut visible</div></div>
+    <div class="step-card"><div class="step-num">2</div><div class="step-title">On analyse tout</div><div class="step-desc">Type d'objet, marque, état et prix marché — on s'en charge pour toi</div></div>
+    <div class="step-card"><div class="step-num">3</div><div class="step-title">Copie-colle</div><div class="step-desc">Annonces prêtes pour Vinted, LBC, Facebook et eBay</div></div>
   </div>
 </section>
 
-<footer>Fait avec ❤️ — AnnonceAI &copy; 2025</footer>
+<footer>Fait avec ❤️ — AssistAnnonce &copy; 2025</footer>
 
 <script>
+  // ─── SUPABASE ───
+  const SUPABASE_URL = 'https://hbjlufgeuzjswdpoxayc.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhiamx1ZmdldXpqc3dkcG94YXljIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2MDU3MjUsImV4cCI6MjA5NDE4MTcyNX0.BKo802JSaycbNK9RUOvJ82NjWth7l_oaiidsdFtVqKk';
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  let currentUser = null;
+  let lastResult = null;
+
+  // ─── AUTH STATE ───
+  sb.auth.onAuthStateChange((event, session) => {
+    currentUser = session?.user || null;
+    updateAuthUI();
+  });
+
+  function updateAuthUI() {
+    const btn = document.getElementById('btnAuthHeader');
+    const nav = document.getElementById('mainNav');
+    if (currentUser) {
+      btn.textContent = '👤 Mon compte';
+      btn.className = 'btn-auth connected';
+      document.getElementById('userEmailDisplay').textContent = currentUser.email;
+      nav.style.display = 'flex';
+    } else {
+      btn.textContent = 'Connexion';
+      btn.className = 'btn-auth';
+      nav.style.display = 'none';
+    }
+  }
+
+  // ─── MODAL ───
+  function openModal() { document.getElementById('modalOverlay').classList.add('open'); }
+  function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); }
+  function closeModalOnOverlay(e) { if (e.target === document.getElementById('modalOverlay')) closeModal(); }
+  function switchToRegister() { document.getElementById('modalLogin').style.display='none'; document.getElementById('modalRegister').style.display='block'; }
+  function switchToLogin() { document.getElementById('modalRegister').style.display='none'; document.getElementById('modalLogin').style.display='block'; }
+
+  function toggleUserMenu() {
+    if (!currentUser) { openModal(); return; }
+    document.getElementById('userDropdown').classList.toggle('open');
+  }
+  document.addEventListener('click', e => {
+    if (!document.getElementById('userMenu').contains(e.target)) {
+      document.getElementById('userDropdown').classList.remove('open');
+    }
+  });
+
+  async function handleLogin() {
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    const btn = document.getElementById('btnLogin');
+    const err = document.getElementById('loginError');
+    err.style.display = 'none';
+    btn.disabled = true; btn.textContent = 'Connexion…';
+    const { error } = await sb.auth.signInWithPassword({ email, password });
+    btn.disabled = false; btn.textContent = 'Se connecter';
+    if (error) { err.textContent = 'Email ou mot de passe incorrect.'; err.style.display = 'block'; }
+    else closeModal();
+  }
+
+  async function handleRegister() {
+    const email = document.getElementById('registerEmail').value.trim();
+    const password = document.getElementById('registerPassword').value;
+    const btn = document.getElementById('btnRegister');
+    const err = document.getElementById('registerError');
+    const suc = document.getElementById('registerSuccess');
+    err.style.display = 'none'; suc.style.display = 'none';
+    btn.disabled = true; btn.textContent = 'Création…';
+    const { error } = await sb.auth.signUp({ email, password });
+    btn.disabled = false; btn.textContent = 'Créer mon compte';
+    if (error) { err.textContent = error.message; err.style.display = 'block'; }
+    else { suc.textContent = '✅ Compte créé ! Vérifie tes emails pour confirmer.'; suc.style.display = 'block'; }
+  }
+
+  async function handleLogout() {
+    document.getElementById('userDropdown').classList.remove('open');
+    await sb.auth.signOut();
+    showGenerate();
+  }
+
+  // ─── NAVIGATION ───
+  function showGenerate() {
+    document.getElementById('generateView').style.display = 'block';
+    document.getElementById('historyView').classList.remove('active');
+    document.getElementById('tabGenerate')?.classList.add('active');
+    document.getElementById('tabHistory')?.classList.remove('active');
+  }
+
+  function showHistory() {
+    document.getElementById('userDropdown').classList.remove('open');
+    if (!currentUser) { openModal(); return; }
+    document.getElementById('generateView').style.display = 'none';
+    document.getElementById('historyView').classList.add('active');
+    document.getElementById('tabGenerate')?.classList.remove('active');
+    document.getElementById('tabHistory')?.classList.add('active');
+    loadHistory();
+  }
+
+  async function loadHistory() {
+    const container = document.getElementById('historyContent');
+    container.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--text-hint)">Chargement…</div>';
+    const { data, error } = await sb.from('annonces').select('*').order('created_at', { ascending: false });
+    if (error || !data || data.length === 0) {
+      container.innerHTML = `<div class="history-empty"><div class="history-empty-icon">📭</div><div class="history-empty-title">Aucune annonce pour l'instant</div><div class="history-empty-sub">Génère ta première annonce et elle apparaîtra ici !</div></div>`;
+      return;
+    }
+    container.innerHTML = `<div class="history-list">${data.map(a => `
+      <div class="history-card">
+        <div class="history-card-top">
+          <div class="history-card-title">${a.vinted?.titre || a.type_objet || 'Annonce'}</div>
+          <div class="history-card-date">${new Date(a.created_at).toLocaleDateString('fr-FR', { day:'numeric', month:'short', year:'numeric' })}</div>
+        </div>
+        <div class="history-card-meta">
+          ${a.marque ? `<span class="history-tag" style="background:#F3F4F6;color:#374151">${a.marque}</span>` : ''}
+          ${a.type_objet ? `<span class="history-tag" style="background:#E8FBF5;color:var(--green-dark)">${a.type_objet}</span>` : ''}
+          ${a.vinted?.etat ? `<span class="history-tag" style="background:#EBF3FE;color:#1877F2">${a.vinted.etat}</span>` : ''}
+        </div>
+        ${a.vinted?.prix ? `<div class="history-card-prix">${a.vinted.prix}</div>` : ''}
+        ${a.fourchette_prix ? `<div style="font-size:12px;color:var(--text-hint);margin-top:4px">Marché : ${a.fourchette_prix}</div>` : ''}
+      </div>`).join('')}</div>`;
+  }
+
+  // ─── SAVE ANNONCE ───
+  async function saveAnnonce(p) {
+    if (!currentUser) return;
+    await sb.from('annonces').insert({
+      user_id: currentUser.id,
+      type_objet: p.article?.type || '',
+      marque: p.article?.marque || '',
+      fourchette_prix: p.article?.fourchette_marche || '',
+      vinted: p.vinted,
+      lbc: p.lbc,
+      facebook: p.facebook,
+      ebay: p.ebay
+    });
+    const banner = document.getElementById('saveBanner');
+    banner.style.display = 'block';
+    setTimeout(() => banner.style.display = 'none', 3000);
+  }
+
+  // ─── IMAGE HANDLING ───
   let images = [];
   const fi = document.getElementById('fileInput');
   const dz = document.getElementById('dropzone');
-  const previews = document.getElementById('previews');
-  const photoCount = document.getElementById('photoCount');
-  const photoNum = document.getElementById('photoNum');
-  const btn = document.getElementById('btnGenerate');
-  const loading = document.getElementById('loading');
-  const errorMsg = document.getElementById('errorMsg');
-  const results = document.getElementById('results');
-  const priceBanner = document.getElementById('priceBanner');
 
   fi.addEventListener('change', function() {
     if (!this.files || this.files.length === 0) return;
     const files = Array.from(this.files);
     let loaded = 0;
     const toLoad = Math.min(files.length, 5 - images.length);
-    files.slice(0, toLoad).forEach(function(file) {
+    files.slice(0, toLoad).forEach(file => {
       const reader = new FileReader();
-      reader.onload = function(e) {
+      reader.onload = e => {
         images.push({ b64: e.target.result.split(',')[1], mime: file.type || 'image/jpeg', src: e.target.result });
-        loaded++;
-        if (loaded === toLoad) renderPreviews();
+        if (++loaded === toLoad) renderPreviews();
       };
       reader.readAsDataURL(file);
     });
@@ -408,24 +614,22 @@
   dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag'); });
   dz.addEventListener('dragleave', () => dz.classList.remove('drag'));
   dz.addEventListener('drop', function(e) {
-    e.preventDefault();
-    dz.classList.remove('drag');
-    if (!e.dataTransfer.files || e.dataTransfer.files.length === 0) return;
+    e.preventDefault(); dz.classList.remove('drag');
+    if (!e.dataTransfer.files?.length) return;
     const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
     const toLoad = Math.min(files.length, 5 - images.length);
     let loaded = 0;
-    files.slice(0, toLoad).forEach(function(file) {
+    files.slice(0, toLoad).forEach(file => {
       const reader = new FileReader();
-      reader.onload = function(e) {
+      reader.onload = e => {
         images.push({ b64: e.target.result.split(',')[1], mime: file.type || 'image/jpeg', src: e.target.result });
-        loaded++;
-        if (loaded === toLoad) renderPreviews();
+        if (++loaded === toLoad) renderPreviews();
       };
       reader.readAsDataURL(file);
     });
   });
 
-  function compressImage(src, mime) {
+  function compressImage(src) {
     return new Promise(resolve => {
       const img = new Image();
       img.onload = function() {
@@ -445,16 +649,17 @@
   }
 
   function renderPreviews() {
+    const previews = document.getElementById('previews');
     previews.innerHTML = '';
     images.forEach((img, i) => {
       const div = document.createElement('div');
       div.className = 'preview-item';
-      div.innerHTML = `<img src="${img.src}" alt="Photo ${i+1}" /><button class="preview-remove" onclick="removeImg(${i})">✕</button>`;
+      div.innerHTML = `<img src="${img.src}" /><button class="preview-remove" onclick="removeImg(${i})">✕</button>`;
       previews.appendChild(div);
     });
-    photoNum.textContent = images.length;
-    photoCount.style.display = images.length > 0 ? 'block' : 'none';
-    btn.disabled = images.length === 0;
+    document.getElementById('photoNum').textContent = images.length;
+    document.getElementById('photoCount').style.display = images.length > 0 ? 'block' : 'none';
+    document.getElementById('btnGenerate').disabled = images.length === 0;
     hideError();
   }
 
@@ -468,13 +673,15 @@
     });
   }
 
-  btn.addEventListener('click', async () => {
+  // ─── GENERATE ───
+  document.getElementById('btnGenerate').addEventListener('click', async () => {
     if (images.length === 0) return;
     hideError();
-    results.classList.remove('show');
-    priceBanner.style.display = 'none';
-    loading.style.display = 'block';
-    btn.disabled = true;
+    document.getElementById('results').classList.remove('show');
+    document.getElementById('priceBanner').style.display = 'none';
+    document.getElementById('saveBanner').style.display = 'none';
+    document.getElementById('loading').style.display = 'block';
+    document.getElementById('btnGenerate').disabled = true;
     setStep(1);
 
     const prompt = `Tu es un expert en revente d'objets d'occasion. Analyse ces photos et identifie l'objet (vêtement, électronique, meuble, livre, jeu vidéo, accessoire, etc.). Génère des annonces optimisées pour 4 plateformes. Pour les champs non applicables à cet objet (ex: taille pour une lampe), réponds avec une chaîne vide "". Pour les prix : propose un prix compétitif réaliste basé sur la marque, l'état et le marché actuel de la seconde main en France. Réponds UNIQUEMENT en JSON valide sans markdown:
@@ -486,7 +693,7 @@
     setStep(3);
 
     try {
-      const compressed = await Promise.all(images.map(img => compressImage(img.src, img.mime)));
+      const compressed = await Promise.all(images.map(img => compressImage(img.src)));
       const content = [
         ...compressed.map(b64 => ({ type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: b64 } })),
         { type: 'text', text: prompt }
@@ -499,6 +706,7 @@
       const data = await res.json();
       const text = data.content.map(i => i.text || '').join('');
       const p = JSON.parse(text.replace(/```json|```/g, '').trim());
+      lastResult = p;
 
       const fill = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val || ''; };
       ['titre','desc','cat','marque','taille','couleur','matiere','etat','prix','note'].forEach(f => {
@@ -509,15 +717,20 @@
         const key = f === 'desc' ? 'description' : f === 'cat' ? 'categorie' : f === 'note' ? 'note_prix' : f;
         fill('f-'+f, p.facebook[key]);
       });
-      priceBanner.innerHTML = `📊 <strong>Prix marché estimé :</strong> ${p.article.fourchette_marche}`;
-      priceBanner.style.display = 'block';
-      results.classList.add('show');
+
+      document.getElementById('priceBanner').innerHTML = `📊 <strong>Prix marché estimé :</strong> ${p.article.fourchette_marche}`;
+      document.getElementById('priceBanner').style.display = 'block';
+      document.getElementById('results').classList.add('show');
       switchTab('vinted');
+
+      // Auto-save si connecté
+      await saveAnnonce(p);
+
     } catch(e) {
       showError('Erreur lors de la génération. Vérifie ta clé API et réessaie.');
     } finally {
-      loading.style.display = 'none';
-      btn.disabled = false;
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('btnGenerate').disabled = false;
     }
   });
 
@@ -539,14 +752,13 @@
     const { ids, labels } = fieldDefs[p];
     const text = ids.map((f, i) => `${labels[i]}: ${document.getElementById(p+'-'+f).textContent}`).join('\n');
     navigator.clipboard.writeText(text).then(() => {
-      btn.textContent = '✓ Copié !';
-      btn.classList.add('copied');
+      btn.textContent = '✓ Copié !'; btn.classList.add('copied');
       setTimeout(() => { btn.textContent = '📋 Copier tout'; btn.classList.remove('copied'); }, 1800);
     });
   }
 
-  function showError(msg) { errorMsg.textContent = msg; errorMsg.style.display = 'block'; }
-  function hideError() { errorMsg.style.display = 'none'; }
+  function showError(msg) { const el = document.getElementById('errorMsg'); el.textContent = msg; el.style.display = 'block'; }
+  function hideError() { document.getElementById('errorMsg').style.display = 'none'; }
 </script>
 </body>
 </html>
