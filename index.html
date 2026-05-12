@@ -549,7 +549,7 @@
       await sb.from('profiles').insert({ id: data.user.id, prenom, nom, ville });
     }
     btn.disabled = false; btn.textContent = 'Créer mon compte';
-    suc.textContent = '✅ Compte créé ! Vérifie tes emails pour confirmer.';
+    suc.textContent = '✅ Compte créé ! Tu peux te connecter maintenant.';
     suc.style.display = 'block';
   }
 
