@@ -38,9 +38,9 @@
     .header-right { display: flex; align-items: center; gap: 10px; }
     .badge-beta { font-size: 11px; font-weight: 700; background: var(--green); color: white; padding: 4px 12px; border-radius: 20px; }
     .lang-switcher { display: flex; gap: 4px; background: var(--bg); border-radius: 20px; padding: 3px; border: 1px solid var(--border-md); }
-    .btn-flag { font-size: 16px; width: 32px; height: 32px; border-radius: 16px; border: none; background: transparent; cursor: pointer; transition: all 0.15s; display: flex; align-items: center; justify-content: center; }
-    .btn-flag:hover { background: white; }
-    .btn-flag.active { background: white; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+    .btn-flag { font-size: 12px; font-weight: 700; width: 36px; height: 28px; border-radius: 14px; border: none; background: transparent; cursor: pointer; transition: all 0.15s; display: flex; align-items: center; justify-content: center; color: var(--text-muted); letter-spacing: 0.3px; }
+    .btn-flag:hover { background: white; color: var(--text); }
+    .btn-flag.active { background: white; color: var(--text); box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
     .btn-auth { font-size: 13px; font-weight: 700; padding: 7px 16px; border-radius: 20px; border: 2px solid var(--border-md); background: white; color: var(--text); cursor: pointer; font-family: 'Plus Jakarta Sans', sans-serif; transition: all 0.15s; }
     .btn-auth:hover { border-color: var(--green); color: var(--green); }
     .btn-auth.connected { background: var(--green); color: white; border-color: var(--green); }
@@ -292,6 +292,10 @@
         <label class="form-label">Mot de passe</label>
         <input class="form-input" type="password" id="registerPassword" placeholder="min. 6 caractères" />
       </div>
+      <div class="form-field">
+        <label class="form-label">Confirmer le mot de passe</label>
+        <input class="form-input" type="password" id="registerPasswordConfirm" placeholder="Répète ton mot de passe" />
+      </div>
       <button class="btn-submit" id="btnRegister" onclick="handleRegister()">Créer mon compte</button>
       <div class="modal-switch">Déjà un compte ? <a onclick="switchToLogin()">Se connecter</a></div>
     </div>
@@ -303,8 +307,8 @@
   <div class="header-right">
     
     <div class="lang-switcher">
-      <button class="btn-flag active" id="btnFR" onclick="setLang('fr')">🇫🇷</button>
-      <button class="btn-flag" id="btnEN" onclick="setLang('en')">🇬🇧</button>
+      <button class="btn-flag active" id="btnFR" onclick="setLang('fr')">FR</button>
+      <button class="btn-flag" id="btnEN" onclick="setLang('en')">EN</button>
     </div>
     <div class="user-menu" id="userMenu">
       <button class="btn-auth" id="btnAuthHeader" onclick="toggleUserMenu()">Connexion</button>
@@ -318,7 +322,7 @@
 </header>
 
 <section class="hero">
-  <div class="hero-eyebrow">On s'occupe de tout</div>
+  <div class="hero-eyebrow"><span id="eyebrowText">On s'occupe de tout</span></div>
   <h1>Quelques photos.<br /><span class="accent">4 annonces prêtes.</span></h1>
   <p>Vêtements, électronique, meubles, jeux vidéo…<br />Uploade tes photos, on rédige tout pour toi.</p>
   <div class="platforms-row">
@@ -550,8 +554,13 @@
     const err = document.getElementById('registerError');
     const suc = document.getElementById('registerSuccess');
     err.style.display = 'none'; suc.style.display = 'none';
+    const passwordConfirm = document.getElementById('registerPasswordConfirm').value;
     if (!prenom || !nom || !email || !password) {
       err.textContent = 'Prénom, nom, email et mot de passe sont obligatoires.';
+      err.style.display = 'block'; return;
+    }
+    if (password !== passwordConfirm) {
+      err.textContent = 'Les mots de passe ne correspondent pas.';
       err.style.display = 'block'; return;
     }
     btn.disabled = true; btn.textContent = 'Création…';
@@ -877,7 +886,7 @@
 
   function applyLang() {
     const t = translations[currentLang];
-    set('.hero-eyebrow', t.eyebrow);
+    set('#eyebrowText', t.eyebrow);
     set('.hero h1', t.h1, true);
     set('.hero p', t.heroP, true);
     set('.tips-title', t.tipsTitle);
