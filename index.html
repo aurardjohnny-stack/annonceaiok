@@ -37,6 +37,10 @@
     .logo span { color: var(--green); }
     .header-right { display: flex; align-items: center; gap: 10px; }
     .badge-beta { font-size: 11px; font-weight: 700; background: var(--green); color: white; padding: 4px 12px; border-radius: 20px; }
+    .lang-switcher { display: flex; gap: 4px; background: var(--bg); border-radius: 20px; padding: 3px; border: 1px solid var(--border-md); }
+    .btn-flag { font-size: 16px; width: 32px; height: 32px; border-radius: 16px; border: none; background: transparent; cursor: pointer; transition: all 0.15s; display: flex; align-items: center; justify-content: center; }
+    .btn-flag:hover { background: white; }
+    .btn-flag.active { background: white; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
     .btn-auth { font-size: 13px; font-weight: 700; padding: 7px 16px; border-radius: 20px; border: 2px solid var(--border-md); background: white; color: var(--text); cursor: pointer; font-family: 'Plus Jakarta Sans', sans-serif; transition: all 0.15s; }
     .btn-auth:hover { border-color: var(--green); color: var(--green); }
     .btn-auth.connected { background: var(--green); color: white; border-color: var(--green); }
@@ -298,6 +302,10 @@
   <a class="logo" onclick="showGenerate()">assist<span>annonce</span></a>
   <div class="header-right">
     
+    <div class="lang-switcher">
+      <button class="btn-flag active" id="btnFR" onclick="setLang('fr')">🇫🇷</button>
+      <button class="btn-flag" id="btnEN" onclick="setLang('en')">🇬🇧</button>
+    </div>
     <div class="user-menu" id="userMenu">
       <button class="btn-auth" id="btnAuthHeader" onclick="toggleUserMenu()">Connexion</button>
       <div class="user-dropdown" id="userDropdown">
@@ -721,7 +729,7 @@
     document.getElementById('btnGenerate').disabled = true;
     setStep(1);
 
-    const prompt = `Tu es un expert en revente d'objets d'occasion. Analyse ces photos et identifie l'objet (vêtement, électronique, meuble, livre, jeu vidéo, accessoire, etc.). Génère des annonces optimisées pour 4 plateformes. Pour les champs non applicables à cet objet (ex: taille pour une lampe), réponds avec une chaîne vide "". Pour les prix : propose un prix compétitif réaliste basé sur la marque, l'état et le marché actuel de la seconde main en France. Réponds UNIQUEMENT en JSON valide sans markdown:
+    const prompt = `Tu es un expert en revente d'objets d'occasion. Analyse ces photos et identifie l'objet (vêtement, électronique, meuble, livre, jeu vidéo, accessoire, etc.). AVANT de générer les annonces, utilise l'outil web_search pour chercher le prix de cet objet d'occasion en France (ex: "Nike Air Max 90 occasion prix Vinted LeBonCoin 2025"). Utilise les résultats pour proposer des prix précis et réalistes. Génère des annonces optimisées pour 4 plateformes. Pour les champs non applicables à cet objet (ex: taille pour une lampe), réponds avec une chaîne vide "". Réponds UNIQUEMENT en JSON valide sans markdown:
 {"article":{"type":"type d'objet détecté","marque":"","fourchette_marche":"ex: 15€-40€ sur LeBonCoin"},"vinted":{"titre":"max 60 chars","description":"2-3 phrases","categorie":"catégorie exacte Vinted","marque":"","taille":"taille si applicable, sinon vide","couleur":"","matiere":"matière/composition si applicable","etat":"Neuf avec étiquette/Neuf sans étiquette/Très bon état/Bon état/Satisfaisant","prix":"ex: 12€","note_prix":"justification courte"},"lbc":{"titre":"max 60 chars","description":"3-4 phrases","categorie":"catégorie LBC exacte","marque":"","taille":"dimensions ou taille si applicable","couleur":"","matiere":"","etat":"Neuf/Comme neuf/Bon état/État correct","prix":"","note_prix":""},"facebook":{"titre":"max 60 chars","description":"2-3 phrases directes","categorie":"catégorie Facebook Marketplace adaptée","marque":"","taille":"","couleur":"","etat":"Neuf/Comme neuf/Bon état/Usé","prix":"","note_prix":""},"ebay":{"titre":"max 80 chars avec mots-clés SEO","description":"4-5 phrases pro","categorie":"catégorie eBay exacte","marque":"","taille":"dimensions ou taille internationale si applicable","couleur":"","matiere":"","etat":"Neuf/Très bon état/Bon état/État correct","prix":"prix majoré frais eBay","note_prix":""}}`;
 
     await new Promise(r => setTimeout(r, 600));
@@ -738,10 +746,10 @@
       const res = await fetch('/api/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ model: 'claude-sonnet-4-5', max_tokens: 1500, messages: [{ role: 'user', content }] })
+        body: JSON.stringify({ model: 'claude-sonnet-4-5', max_tokens: 1500, messages: [{ role: 'user', content }], tools: [{ type: 'web_search_20250305', name: 'web_search' }] })
       });
       const data = await res.json();
-      const text = data.content.map(i => i.text || '').join('');
+      const text = data.content.map(i => i.type === 'text' ? i.text : '').filter(Boolean).join('');
       const p = JSON.parse(text.replace(/```json|```/g, '').trim());
       lastResult = p;
 
@@ -796,6 +804,117 @@
 
   function showError(msg) { const el = document.getElementById('errorMsg'); el.textContent = msg; el.style.display = 'block'; }
   function hideError() { document.getElementById('errorMsg').style.display = 'none'; }
+
+  // ─── TRANSLATIONS ───
+  let currentLang = 'fr';
+  const translations = {
+    fr: {
+      eyebrow: "On s'occupe de tout",
+      h1: 'Quelques photos.<br /><span class="accent">4 annonces prêtes.</span>',
+      heroP: "Vêtements, électronique, meubles, jeux vidéo…<br />Uploade tes photos, on rédige tout pour toi.",
+      tipsTitle: "📸 Pour des annonces précises, prends 3 photos :",
+      tip1label: "Vue générale", tip1desc: "L'objet en entier, bien visible",
+      tip2label: "Marque / modèle", tip2desc: "Étiquette, logo ou référence",
+      tip3label: "Détails / défauts", tip3desc: "Rayures, usure ou points forts",
+      uploadTitle: "Glisse tes photos ici", uploadSub: "ou <u>clique pour choisir</u> — JPG, PNG, WEBP",
+      uploadMax: "Jusqu'à 5 photos",
+      btnGenerate: "✦ Générer mes 4 annonces",
+      step1: "On analyse tes photos", step2: "On estime le prix marché", step3: "On rédige tes annonces",
+      loadingTitle: "On s'occupe de tout… ⚡",
+      tabGenerate: "✦ Générer", tabHistory: "📋 Mes annonces",
+      howTag: "✦ Comment ça marche", howH2: "Simple comme bonjour 👋",
+      step1title: "Prends 3 photos", step1desc: "Vue générale, marque/modèle, et un détail ou défaut visible",
+      step2title: "On analyse tout", step2desc: "Type d'objet, marque, état et prix marché — on s'en charge pour toi",
+      step3title: "Copie-colle", step3desc: "Annonces prêtes pour Vinted, LBC, Facebook et eBay",
+      loginTitle: "Connexion 👋", loginSub: "Retrouve toutes tes annonces sauvegardées",
+      registerTitle: "Créer un compte ✨", registerSub: "Gratuit — sauvegarde toutes tes annonces",
+      btnLogin: "Se connecter", btnRegister: "Créer mon compte",
+      btnLang: "🇬🇧 EN", statLabel1: "plateformes", statLabel2: "par annonce", statLabel3: "copier-coller",
+      historyEmpty: "Aucune annonce pour l'instant", historyEmptySub: "Génère ta première annonce et elle apparaîtra ici !",
+      saveBanner: "✅ Annonce sauvegardée dans ton historique !",
+      myAccount: "👤 Mon compte", connexion: "Connexion", myAnnonces: "📋 Mes annonces", logout: "👋 Se déconnecter",
+    },
+    en: {
+      eyebrow: "We handle everything",
+      h1: 'A few photos.<br /><span class="accent">4 listings ready.</span>',
+      heroP: "Clothes, electronics, furniture, video games…<br />Upload your photos, we write everything for you.",
+      tipsTitle: "📸 For precise listings, take 3 photos:",
+      tip1label: "General view", tip1desc: "The whole item, clearly visible",
+      tip2label: "Brand / model", tip2desc: "Label, logo or reference",
+      tip3label: "Details / flaws", tip3desc: "Scratches, wear or highlights",
+      uploadTitle: "Drop your photos here", uploadSub: "or <u>click to choose</u> — JPG, PNG, WEBP",
+      uploadMax: "Up to 5 photos",
+      btnGenerate: "✦ Generate my 4 listings",
+      step1: "Analysing your photos", step2: "Estimating market price", step3: "Writing your listings",
+      loadingTitle: "We're on it… ⚡",
+      tabGenerate: "✦ Generate", tabHistory: "📋 My listings",
+      howTag: "✦ How it works", howH2: "Easy as pie 👋",
+      step1title: "Take 3 photos", step1desc: "General view, brand/model, and a detail or visible flaw",
+      step2title: "We analyse everything", step2desc: "Item type, brand, condition and market price — we handle it",
+      step3title: "Copy-paste", step3desc: "Listings ready for Vinted, LBC, Facebook and eBay",
+      loginTitle: "Sign in 👋", loginSub: "Find all your saved listings",
+      registerTitle: "Create an account ✨", registerSub: "Free — save all your listings",
+      btnLogin: "Sign in", btnRegister: "Create my account",
+      btnLang: "🇫🇷 FR", statLabel1: "platforms", statLabel2: "per listing", statLabel3: "copy-paste",
+      historyEmpty: "No listings yet", historyEmptySub: "Generate your first listing and it will appear here!",
+      saveBanner: "✅ Listing saved in your history!",
+      myAccount: "👤 My account", connexion: "Sign in", myAnnonces: "📋 My listings", logout: "👋 Sign out",
+    }
+  };
+
+  function setLang(lang) {
+    currentLang = lang;
+    document.getElementById('btnFR').classList.toggle('active', lang === 'fr');
+    document.getElementById('btnEN').classList.toggle('active', lang === 'en');
+    applyLang();
+  }
+
+  function set(sel, val, html=false) {
+    const el = typeof sel === 'string' ? (sel.startsWith('#') ? document.getElementById(sel.slice(1)) : document.querySelector(sel)) : sel;
+    if (!el) return;
+    if (html) el.innerHTML = val; else el.textContent = val;
+  }
+
+  function applyLang() {
+    const t = translations[currentLang];
+    set('.hero-eyebrow', t.eyebrow);
+    set('.hero h1', t.h1, true);
+    set('.hero p', t.heroP, true);
+    set('.tips-title', t.tipsTitle);
+    const tipLabels = document.querySelectorAll('.tip-label');
+    const tipDescs = document.querySelectorAll('.tip-desc');
+    if (tipLabels[0]) { tipLabels[0].textContent = t.tip1label; tipDescs[0].textContent = t.tip1desc; }
+    if (tipLabels[1]) { tipLabels[1].textContent = t.tip2label; tipDescs[1].textContent = t.tip2desc; }
+    if (tipLabels[2]) { tipLabels[2].textContent = t.tip3label; tipDescs[2].textContent = t.tip3desc; }
+    set('.upload-title', t.uploadTitle);
+    set('.upload-sub', t.uploadSub, true);
+    set('.upload-max', t.uploadMax);
+    set('#btnGenerate', t.btnGenerate);
+    const s1 = document.getElementById('step1'); if (s1) s1.innerHTML = `<span class="dot"></span> ${t.step1}`;
+    const s2 = document.getElementById('step2'); if (s2) s2.innerHTML = `<span class="dot"></span> ${t.step2}`;
+    const s3 = document.getElementById('step3'); if (s3) s3.innerHTML = `<span class="dot"></span> ${t.step3}`;
+    set('.loading-title', t.loadingTitle);
+    set('#tabGenerate', t.tabGenerate);
+    set('#tabHistory', t.tabHistory);
+    set('.how-tag', t.howTag);
+    set('.how h2', t.howH2);
+    const stepTitles = document.querySelectorAll('.step-title');
+    const stepDescs = document.querySelectorAll('.step-desc');
+    if (stepTitles[0]) { stepTitles[0].textContent = t.step1title; stepDescs[0].textContent = t.step1desc; }
+    if (stepTitles[1]) { stepTitles[1].textContent = t.step2title; stepDescs[1].textContent = t.step2desc; }
+    if (stepTitles[2]) { stepTitles[2].textContent = t.step3title; stepDescs[2].textContent = t.step3desc; }
+    const stats = document.querySelectorAll('.stat-label');
+    if (stats[0]) stats[0].textContent = t.statLabel1;
+    if (stats[1]) stats[1].textContent = t.statLabel2;
+    if (stats[2]) stats[2].textContent = t.statLabel3;
+    const authBtn = document.getElementById('btnAuthHeader');
+    if (authBtn) authBtn.textContent = currentUser ? t.myAccount : t.connexion;
+    const dropItems = document.querySelectorAll('.dropdown-item');
+    if (dropItems[0]) dropItems[0].textContent = t.myAnnonces;
+    if (dropItems[1]) dropItems[1].textContent = t.logout;
+    const saveBanner = document.getElementById('saveBanner');
+    if (saveBanner) saveBanner.textContent = t.saveBanner;
+  }
 </script>
 </body>
 </html>
