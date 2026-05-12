@@ -104,9 +104,9 @@
 </header>
 
 <section class="hero">
-  <div class="hero-tag">✦ Propulsé par l'IA</div>
+  <div class="hero-tag">✦ On s'occupe de tout</div>
   <h1>Quelques photos.<br /><span>4 annonces prêtes.</span></h1>
-  <p>Upload tes photos — l'IA génère titre, description, catégorie, état et prix pour chaque plateforme.</p>
+  <p>Vêtements, électronique, meubles, jeux vidéo… Upload tes photos — on rédige ton titre, ta description, la catégorie, l'état et le prix pour chaque plateforme.</p>
   <div class="platforms-row">
     <span class="platform-pill">Vinted</span>
     <span class="platform-pill">LeBonCoin</span>
@@ -121,21 +121,21 @@
     <div class="tips-title">📸 Pour des annonces précises, prends 3 photos :</div>
     <div class="tips-grid">
       <div class="tip-item">
-        <div class="tip-icon">👕</div>
-        <div class="tip-label">Article déplié</div>
-        <div class="tip-desc">Posé à plat, bien visible en entier</div>
+        <div class="tip-icon">📦</div>
+        <div class="tip-label">Vue générale</div>
+        <div class="tip-desc">L'objet en entier, bien visible</div>
         <div class="tip-badge">Indispensable</div>
       </div>
       <div class="tip-item">
         <div class="tip-icon">🏷️</div>
-        <div class="tip-label">Étiquette</div>
-        <div class="tip-desc">Marque, taille et composition</div>
+        <div class="tip-label">Marque / modèle</div>
+        <div class="tip-desc">Étiquette, logo ou référence</div>
         <div class="tip-badge">Indispensable</div>
       </div>
       <div class="tip-item">
         <div class="tip-icon">🔍</div>
         <div class="tip-label">Détails / défauts</div>
-        <div class="tip-desc">Logo, imprimé, ou traces d'usure</div>
+        <div class="tip-desc">Rayures, usure ou points forts</div>
         <div class="tip-badge">Recommandé</div>
       </div>
     </div>
@@ -242,12 +242,12 @@
     <div class="step-card">
       <div class="step-num">1</div>
       <div class="step-title">Prends 3 photos</div>
-      <div class="step-desc">Article déplié, étiquette, et un détail ou défaut visible</div>
+      <div class="step-desc">Vue générale, marque/modèle, et un détail ou défaut visible</div>
     </div>
     <div class="step-card">
       <div class="step-num">2</div>
-      <div class="step-title">L'IA analyse tout</div>
-      <div class="step-desc">Marque, état, matière et prix marché — détectés automatiquement</div>
+      <div class="step-title">On analyse tout</div>
+      <div class="step-desc">Type d'objet, marque, état et prix marché — on s'en charge pour toi</div>
     </div>
     <div class="step-card">
       <div class="step-num">3</div>
@@ -364,8 +364,8 @@
     btn.disabled = true;
     setStep(1);
 
-    const prompt = `Tu es un expert en revente de vêtements d'occasion. Analyse ces photos et génère des annonces optimisées pour 4 plateformes. Pour les prix : propose un prix compétitif réaliste basé sur la marque, l'état et le marché actuel de la seconde main en France. Réponds UNIQUEMENT en JSON valide sans markdown:
-{"article":{"marque":"","type":"","fourchette_marche":"ex: 8€-20€ sur Vinted"},"vinted":{"titre":"max 60 chars","description":"2-3 phrases","categorie":"catégorie exacte","marque":"","taille":"XS/S/M/L/XL/XXL","couleur":"","matiere":"composition","etat":"Neuf avec étiquette/Neuf sans étiquette/Très bon état/Bon état/Satisfaisant","prix":"ex: 12€","note_prix":"justification courte"},"lbc":{"titre":"max 60 chars","description":"3-4 phrases","categorie":"catégorie LBC","marque":"","taille":"ex: L / 40-42","couleur":"","matiere":"","etat":"Neuf/Comme neuf/Bon état/État correct","prix":"","note_prix":""},"facebook":{"titre":"max 60 chars","description":"2-3 phrases directes","categorie":"Vêtements et accessoires","marque":"","taille":"","couleur":"","etat":"Neuf/Comme neuf/Bon état/Usé","prix":"","note_prix":""},"ebay":{"titre":"max 80 chars avec mots-clés","description":"4-5 phrases pro","categorie":"catégorie eBay","marque":"","taille":"taille internationale","couleur":"","matiere":"","etat":"Neuf/Très bon état/Bon état/État correct","prix":"prix majoré frais eBay","note_prix":""}}`;
+    const prompt = `Tu es un expert en revente d'objets d'occasion. Analyse ces photos et identifie l'objet (vêtement, électronique, meuble, livre, jeu vidéo, accessoire, etc.). Génère des annonces optimisées pour 4 plateformes. Pour les champs non applicables à cet objet (ex: taille pour une lampe), réponds avec une chaîne vide "". Pour les prix : propose un prix compétitif réaliste basé sur la marque, l'état et le marché actuel de la seconde main en France. Réponds UNIQUEMENT en JSON valide sans markdown:
+{"article":{"type":"type d'objet détecté","marque":"","fourchette_marche":"ex: 15€-40€ sur LeBonCoin"},"vinted":{"titre":"max 60 chars","description":"2-3 phrases","categorie":"catégorie exacte Vinted","marque":"","taille":"taille si applicable, sinon vide","couleur":"","matiere":"matière/composition si applicable","etat":"Neuf avec étiquette/Neuf sans étiquette/Très bon état/Bon état/Satisfaisant","prix":"ex: 12€","note_prix":"justification courte"},"lbc":{"titre":"max 60 chars","description":"3-4 phrases","categorie":"catégorie LBC exacte","marque":"","taille":"dimensions ou taille si applicable","couleur":"","matiere":"","etat":"Neuf/Comme neuf/Bon état/État correct","prix":"","note_prix":""},"facebook":{"titre":"max 60 chars","description":"2-3 phrases directes","categorie":"catégorie Facebook Marketplace adaptée","marque":"","taille":"","couleur":"","etat":"Neuf/Comme neuf/Bon état/Usé","prix":"","note_prix":""},"ebay":{"titre":"max 80 chars avec mots-clés SEO","description":"4-5 phrases pro","categorie":"catégorie eBay exacte","marque":"","taille":"dimensions ou taille internationale si applicable","couleur":"","matiere":"","etat":"Neuf/Très bon état/Bon état/État correct","prix":"prix majoré frais eBay","note_prix":""}}`;
 
     await new Promise(r => setTimeout(r, 600));
     setStep(2);
