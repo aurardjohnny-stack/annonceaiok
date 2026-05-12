@@ -237,13 +237,13 @@
     @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
 
     /* NUMBERS */
-    .numbers { background: var(--green); padding: 3rem 1.5rem; }
+    .numbers { background: linear-gradient(180deg, #ffffff 0%, #00C896 100%); padding: 3rem 1.5rem; }
     .numbers-inner { max-width: 800px; margin: 0 auto; display: flex; align-items: center; justify-content: center; gap: 0; flex-wrap: wrap; }
     .number-item { flex: 1; min-width: 200px; text-align: center; padding: 1rem; }
-    .number-divider { width: 1px; height: 60px; background: rgba(255,255,255,0.25); flex-shrink: 0; }
-    .number-val { font-family: 'Outfit', sans-serif; font-size: clamp(2rem, 5vw, 3rem); font-weight: 900; color: white; line-height: 1; letter-spacing: -1px; }
-    .number-label { font-size: 14px; font-weight: 700; color: rgba(255,255,255,0.9); margin-top: 6px; }
-    .number-sub { font-size: 12px; color: rgba(255,255,255,0.6); margin-top: 3px; }
+    .number-divider { width: 1px; height: 60px; background: rgba(0,0,0,0.1); flex-shrink: 0; }
+    .number-val { font-family: 'Outfit', sans-serif; font-size: clamp(2rem, 5vw, 3rem); font-weight: 900; color: var(--text); line-height: 1; letter-spacing: -1px; }
+    .number-label { font-size: 14px; font-weight: 700; color: var(--text); margin-top: 6px; }
+    .number-sub { font-size: 12px; color: var(--text-muted); margin-top: 3px; }
 
     /* WHY */
     .why { background: white; border-top: 1px solid var(--border); padding: 5rem 1.5rem; }
@@ -359,12 +359,32 @@
     <span class="platform-pill p-fb">Facebook</span>
     <span class="platform-pill p-ebay">eBay</span>
   </div>
-  <div class="stats-bar">
-    <div class="stat-item"><div class="stat-num">4<span>x</span></div><div class="stat-label">plateformes</div></div>
-    <div class="stat-item"><div class="stat-num">~<span>30</span>s</div><div class="stat-label">par annonce</div></div>
-    <div class="stat-item"><div class="stat-num"><span>100</span>%</div><div class="stat-label">copier-coller</div></div>
+
+</section>
+
+<!-- CHIFFRES -->
+<section class="numbers">
+  <div class="numbers-inner">
+    <div class="number-item">
+      <div class="number-val">4</div>
+      <div class="number-label">plateformes couvertes</div>
+      <div class="number-sub">Vinted, LeBonCoin, Facebook, eBay</div>
+    </div>
+    <div class="number-divider"></div>
+    <div class="number-item">
+      <div class="number-val">~30s</div>
+      <div class="number-label">pour 4 annonces complètes</div>
+      <div class="number-sub">Titre, description, prix, catégorie</div>
+    </div>
+    <div class="number-divider"></div>
+    <div class="number-item">
+      <div class="number-val">100%</div>
+      <div class="number-label">prix en temps réel</div>
+      <div class="number-sub">Analysés sur les vraies annonces du moment</div>
+    </div>
   </div>
 </section>
+
 
 <div class="tool-wrapper">
   <div class="main-nav" id="mainNav" style="display:none">
@@ -499,29 +519,6 @@
     <div id="historyContent"></div>
   </div>
 </div>
-
-<!-- CHIFFRES -->
-<section class="numbers">
-  <div class="numbers-inner">
-    <div class="number-item">
-      <div class="number-val">4</div>
-      <div class="number-label">plateformes couvertes</div>
-      <div class="number-sub">Vinted, LeBonCoin, Facebook, eBay</div>
-    </div>
-    <div class="number-divider"></div>
-    <div class="number-item">
-      <div class="number-val">~30s</div>
-      <div class="number-label">pour 4 annonces complètes</div>
-      <div class="number-sub">Titre, description, prix, catégorie</div>
-    </div>
-    <div class="number-divider"></div>
-    <div class="number-item">
-      <div class="number-val">100%</div>
-      <div class="number-label">prix en temps réel</div>
-      <div class="number-sub">Analysés sur les vraies annonces du moment</div>
-    </div>
-  </div>
-</section>
 
 <!-- POURQUOI -->
 <section class="why">
